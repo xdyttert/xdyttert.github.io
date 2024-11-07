@@ -1,0 +1,10 @@
+@import './base.css';
+
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100vw; /* Viewport width */
+  height: 100vh; /* Viewport height */
+  overflow: hidden; /* Prevent scrollbars */
+}
+
