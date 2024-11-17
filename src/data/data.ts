@@ -7,7 +7,7 @@ const nodes: Nodes = {
 }
 
 const edges: Edges = {
-  edge1: { source: "node1", target: "node2", label: 42 },
+  edge1: { source: "node1", target: "node2", label: 420 },
   edge2: { source: "node2", target: "node3", label: 69 },
 }
 
