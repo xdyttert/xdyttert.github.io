@@ -1,36 +1,25 @@
-name: Deploy Vue App to GitHub Pages
+name: Deploy TypeScript to GitHub Pages
 
 on:
   push:
     branches:
-      - main # Trigger the workflow when pushing to the main branch
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout the code
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16' # Specify the Node.js version (adjust as needed)
-
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Build the Vue app
-      - name: Build project
-        run: npm run build
+      - name: Build TypeScript
+        run: npx tsc
 
-      # Step 5: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # Use GitHub's token for authentication
-          publish_dir: ./dist # Directory to deploy (output of Vue build)
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
