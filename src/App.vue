@@ -3,6 +3,8 @@ import { reactive, ref } from "vue"
 import { type Nodes, type Edges, VNetworkGraph } from "v-network-graph";
 import * as vNG from "v-network-graph"
 import data from "./data/data"
+import { isReadonlyKeywordOrPlusOrMinusToken } from "typescript";
+import { ssrRenderDynamicAttr } from "vue/server-renderer";
 
 
 const nodes: Nodes = reactive({ ...data.nodes })
