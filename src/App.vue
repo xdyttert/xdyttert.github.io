@@ -73,7 +73,7 @@ function removeEdge() {
     :configs="data.configs"
   >
   <template #edge-label="{ edge, ...slotProps }">
-      <v-edge-label :text="edge.label" align="center" vertical-align="above" v-bind="slotProps" />
+      <v-edge-label :text="edge.weight" align="center" vertical-align="above" v-bind="slotProps" />
     </template>
   </v-network-graph>
 </template>

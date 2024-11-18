@@ -11,11 +11,14 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "heap": "^0.2.7",
+    "heap-js": "^2.5.0",
     "v-network-graph": "^0.9.18",
     "vue": "^3.5.12"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
+    "@types/heap": "^0.2.34",
     "@types/node": "^20.17.0",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vitejs/plugin-vue-jsx": "^4.0.1",
