@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue"
-import { type Nodes, type Edges, VNetworkGraph, EventHandlers } from "v-network-graph";
+import { type Nodes, type Edges, VNetworkGraph } from "v-network-graph";
 import * as vNG from "v-network-graph"
 import data from "./data/data"
 import { isReadonlyKeywordOrPlusOrMinusToken } from "typescript";
