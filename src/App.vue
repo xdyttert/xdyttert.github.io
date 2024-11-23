@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue"
-import { type Nodes, type Edges, VNetworkGraph } from "v-network-graph";
+import { type Nodes, type Edges, VNetworkGraph, EventHandlers } from "v-network-graph";
 import * as vNG from "v-network-graph"
 import data from "./data/data"
 import { isReadonlyKeywordOrPlusOrMinusToken } from "typescript";
@@ -13,8 +13,14 @@ const edges: Edges = reactive({ ...data.edges })
 const nextNodeIndex = ref(Object.keys(nodes).length + 1)
 const nextEdgeIndex = ref(Object.keys(edges).length + 1)
 
+const graph = ref<vNG.Instance>()
+
 const selectedNodes = ref<string[]>([])
 const selectedEdges = ref<string[]>([])
+
+// const eventHandlers: EventHandlers = {
+//   "edge:click": 
+// }
 
 function addNode() {
   const nodeId = `node${nextNodeIndex.value}`
@@ -47,9 +53,35 @@ function removeEdge() {
   }
 }
 
+function updateNodes(){
+  for(const key in data.nodes){
+    delete nodes[key]
+    nodes[key] = data.nodes[key]
+  }
+}
+
+function updateEdges(){
+  for(const key in data.edges){
+    delete edges[key]
+    edges[key] = data.edges[key]
+  }
+}
+
 function handleDijkstra(){
   dijkstra(data.nodes["node1"]);
+  updateNodes();
 }
+
+function updateEdgeWeight(){
+  for(const edgeId of selectedEdges.value){
+    data.edges[edgeId].weight = +(document.getElementById("weightinput")! as HTMLInputElement).value;
+    console.log((document.getElementById("weightinput")! as HTMLInputElement).value)
+  }
+  updateEdges();
+}
+
+
+
 </script>
 
 <template>
@@ -71,6 +103,10 @@ function handleDijkstra(){
       >
     </div>
     <div>
+      <input type="integer" id="weightinput">
+        <el-button @click="updateEdgeWeight">update edge weight</el-button>
+    </div>
+    <div>
       <el-button @click="handleDijkstra">run dijkstra</el-button>
     </div>
   </div>
@@ -78,6 +114,7 @@ function handleDijkstra(){
   <v-network-graph
     v-model:selected-nodes="selectedNodes"
     v-model:selected-edges="selectedEdges"
+    ref="graph"
     :nodes="nodes"
     :edges="edges"
     :layouts="data.layouts"
@@ -88,14 +125,6 @@ function handleDijkstra(){
         nodeId, scale, x, y, config, textAnchor, dominantBaseline
       }"
     >
-      <text
-        x="0"
-        y="0"
-        :font-size="9 * scale"
-        text-anchor="middle"
-        dominant-baseline="central"
-        fill="#ffffff"
-      >{{ nodeId }}</text>
       <text
         x="0"
         y="0"
@@ -112,3 +141,5 @@ function handleDijkstra(){
     </template>
   </v-network-graph>
 </template>
+
+
