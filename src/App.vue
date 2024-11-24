@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue"
-import { type Nodes, type Edges, VNetworkGraph } from "v-network-graph";
+import { type Nodes, type Edges, VNetworkGraph, type Node, type Edge } from "v-network-graph";
 import * as vNG from "v-network-graph"
-import data from "./data/data"
+import data, { compareFunc, makeEdgesLists } from "./data/data"
 import { isReadonlyKeywordOrPlusOrMinusToken } from "typescript";
 import { ssrRenderDynamicAttr } from "vue/server-renderer";
-import { dijkstra } from "./algorithms/dijkstra"
+import { dijkstra, oneStepDijkstra } from "./algorithms/dijkstra"
+import PriorityQueue from "ts-priority-queue";
+import { SortedLinkedList } from "./data/linkedList";
+import { oneStepSpira, spira } from "./algorithms/spira";
 
 
 const nodes: Nodes = reactive({ ...data.nodes })
@@ -18,15 +21,14 @@ const graph = ref<vNG.Instance>()
 const selectedNodes = ref<string[]>([])
 const selectedEdges = ref<string[]>([])
 
-// const eventHandlers: EventHandlers = {
-//   "edge:click": 
-// }
+const dijkstraStep = ref(0)
+const spiraStep = ref(0)
 
 function addNode() {
   const nodeId = `node${nextNodeIndex.value}`
   const name = `N${nextNodeIndex.value}`
-  data.nodes[nodeId] = { name, distance: 0, solved: false, prev: null }
-  nodes[nodeId] = { name, distance: 0, solved: false, prev: null }
+  data.nodes[nodeId] = { name, distance: 0, solved: false, prev: null, color: "blue", out: new SortedLinkedList<Node>(compareFunc), in: new SortedLinkedList<Node>(compareFunc) }
+  nodes[nodeId] = { name, distance: 0, solved: false, prev: null, color: "blue", out: new SortedLinkedList<Node>(compareFunc), in: new SortedLinkedList<Node>(compareFunc) }
   nextNodeIndex.value++
 }
 
@@ -41,8 +43,11 @@ function addEdge() {
   if (selectedNodes.value.length !== 2) return
   const [source, target] = selectedNodes.value
   const edgeId = `edge${nextEdgeIndex.value}`
-  data.edges[edgeId] = { source, target, weight: 0 }
-  edges[edgeId] = { source, target, weight: 0 }
+  const edge = { source, target, weight: 0, queueKey: 0 }
+  data.edges[edgeId] = edge
+  edges[edgeId] = edge
+  data.nodes[source].out.insertNode(edge)
+  data.nodes[target].in.insertNode(edge)
   nextEdgeIndex.value++
 }
 
@@ -75,9 +80,36 @@ function handleDijkstra(){
 function updateEdgeWeight(){
   for(const edgeId of selectedEdges.value){
     data.edges[edgeId].weight = +(document.getElementById("weightinput")! as HTMLInputElement).value;
-    console.log((document.getElementById("weightinput")! as HTMLInputElement).value)
   }
   updateEdges();
+}
+
+function forwardStepDijkstra(){
+  oneStepDijkstra(dijkstraStep.value, data.nodes["node1"]);
+  updateNodes();
+  updateEdges();
+  dijkstraStep.value++;
+}
+
+function resetDijkstra(){
+  dijkstraStep.value = 0
+}
+
+function handleSpira(){
+  console.log(data.nodes)
+  spira(data.nodes["node1"])
+  updateNodes()
+}
+
+function forwardStepSpira(){
+  oneStepSpira(spiraStep.value, data.nodes["node1"]);
+  updateNodes();
+  updateEdges();
+  spiraStep.value++;
+}
+
+function resetSpira(){
+  spiraStep.value = 0
 }
 
 
@@ -108,6 +140,21 @@ function updateEdgeWeight(){
     </div>
     <div>
       <el-button @click="handleDijkstra">run dijkstra</el-button>
+    </div>
+    <div>
+      <el-button @click="forwardStepDijkstra">></el-button>
+    </div>
+    <div>
+    <el-button @click="resetDijkstra">reset dijkstra</el-button>
+    </div>
+    <div>
+      <el-button @click="handleSpira">run spira</el-button>
+    </div>
+    <div>
+      <el-button @click="forwardStepSpira">></el-button>
+    </div>
+    <div>
+    <el-button @click="resetSpira">reset spira</el-button>
     </div>
   </div>
 
