@@ -6,6 +6,7 @@ import data, { compareFunc, makeEdgesLists } from "./data/data"
 import { isReadonlyKeywordOrPlusOrMinusToken } from "typescript";
 import { ssrRenderDynamicAttr } from "vue/server-renderer";
 import { dijkstra, oneStepDijkstra } from "./algorithms/dijkstra"
+import { oneStepZwick, zwick } from "./algorithms/zwick"
 import PriorityQueue from "ts-priority-queue";
 import { SortedLinkedList } from "./data/linkedList";
 import { oneStepSpira, spira } from "./algorithms/spira";
@@ -23,6 +24,8 @@ const selectedEdges = ref<string[]>([])
 
 const dijkstraStep = ref(0)
 const spiraStep = ref(0)
+const zwickStep = ref(0)
+let zwickInnerCycle = true
 
 function addNode() {
   const nodeId = `node${nextNodeIndex.value}`
@@ -30,13 +33,29 @@ function addNode() {
   data.nodes[nodeId] = { name, distance: 0, solved: false, prev: null, color: "blue", out: new SortedLinkedList<Node>(compareFunc), in: new SortedLinkedList<Node>(compareFunc) }
   nodes[nodeId] = { name, distance: 0, solved: false, prev: null, color: "blue", out: new SortedLinkedList<Node>(compareFunc), in: new SortedLinkedList<Node>(compareFunc) }
   nextNodeIndex.value++
+  console.log(selectedNodes)
 }
 
 function removeNode() {
+  let pastSelectedEdges = selectedEdges.value
+  for (const key in selectedEdges.value){
+    delete selectedEdges.value[key]
+  }
   for (const nodeId of selectedNodes.value) {
+    for (const key in data.edges){
+      if (data.edges[key].source == nodeId){
+        selectedEdges.value.push(key)
+      }
+      if (data.edges[key].target == nodeId){
+        selectedEdges.value.push(key)
+      }
+    }
+    removeEdge()
     delete data.nodes[nodeId]
     delete nodes[nodeId]
   }
+  selectedNodes.value = []
+  selectedEdges.value = pastSelectedEdges
 }
 
 function addEdge() {
@@ -53,6 +72,11 @@ function addEdge() {
 
 function removeEdge() {
   for (const edgeId of selectedEdges.value) {
+    let edge = data.edges[edgeId]
+    let source = data.nodes[edge.source]
+    let target = data.nodes[edge.target]
+    source.out.deleteNode(edge)
+    target.in.deleteNode(edge)
     delete data.edges[edgeId]
     delete edges[edgeId]
   }
@@ -79,7 +103,11 @@ function handleDijkstra(){
 
 function updateEdgeWeight(){
   for(const edgeId of selectedEdges.value){
+    data.nodes[edges[edgeId].source].out.deleteNode(edges[edgeId])
+    data.nodes[edges[edgeId].target].in.deleteNode(edges[edgeId])
     data.edges[edgeId].weight = +(document.getElementById("weightinput")! as HTMLInputElement).value;
+    data.nodes[edges[edgeId].source].out.insertNode(edges[edgeId])
+    data.nodes[edges[edgeId].target].in.insertNode(edges[edgeId])
   }
   updateEdges();
 }
@@ -109,24 +137,61 @@ function forwardStepSpira(){
 }
 
 function resetSpira(){
-  spiraStep.value = 0
+  zwickStep.value = 0
 }
 
+function handleZwick(){
+  console.log(data.nodes)
+  zwick(data.nodes["node1"])
+  updateNodes()
+}
 
+function forwardStepZwick(){
+  zwickInnerCycle = oneStepZwick(zwickStep.value, data.nodes["node1"], zwickInnerCycle);
+  updateNodes();
+  updateEdges();
+  zwickStep.value++;
+}
+
+function resetZwick(){
+  zwickStep.value = 0
+}
 
 </script>
+<style scoped>
+.button-container {
+  display: flex;
+  flex-direction: column; /* Stack rows vertically */
+  gap: 10px; /* Add spacing between rows */
+}
+
+.text-input{
+  max-width: 50px;
+}
+
+.row {
+  display: flex; /* Use flexbox for row alignment */
+  align-items: center; /* Vertically center label and button */
+  gap: 10px; /* Space between label and button */
+}
+
+.label {
+  min-width: 55px; /* Set consistent label width */
+  text-align: center; /* Right-align label text */
+}
+</style>
 
 <template>
   <div class="demo-control-panel">
-    <div>
-      <label>Node:</label>
+    <div class="row">
+      <label class="label">Node: </label>
       <el-button @click="addNode">add</el-button>
       <el-button :disabled="selectedNodes.length == 0" @click="removeNode"
         >remove</el-button
       >
     </div>
-    <div>
-      <label>Edge:</label>
+    <div class="row">
+      <label class="label">Edge: </label>
       <el-button :disabled="selectedNodes.length != 2" @click="addEdge"
         >add</el-button
       >
@@ -134,27 +199,33 @@ function resetSpira(){
         >remove</el-button
       >
     </div>
-    <div>
-      <input type="integer" id="weightinput">
+    <div class="row">
+        <input class="text-input" type="integer" id="weightinput">
         <el-button @click="updateEdgeWeight">update edge weight</el-button>
     </div>
-    <div>
-      <el-button @click="handleDijkstra">run dijkstra</el-button>
-    </div>
-    <div>
+
+    <!-- DIJKSTRA SECTION-->
+    <div class="row">
+      <!-- <el-button @click="handleDijkstra">run dijkstra</el-button> -->
+      <label class="label"> Dijkstra: </label>
       <el-button @click="forwardStepDijkstra">></el-button>
+      <el-button @click="resetDijkstra">reset dijkstra</el-button>
     </div>
-    <div>
-    <el-button @click="resetDijkstra">reset dijkstra</el-button>
-    </div>
-    <div>
-      <el-button @click="handleSpira">run spira</el-button>
-    </div>
-    <div>
+
+    <!-- SPIRA SECTION-->
+    <div class="row">
+      <!-- <el-button @click="handleSpira">run spira</el-button> -->
+       <label class="label"> Spira: </label>
       <el-button @click="forwardStepSpira">></el-button>
+      <el-button @click="resetSpira">reset spira</el-button>
     </div>
-    <div>
-    <el-button @click="resetSpira">reset spira</el-button>
+
+    <!-- ZWICK SECTION-->
+    <div class="row">
+      <!-- <el-button @click="handleZwick">run zwick</el-button> -->
+       <label class="label"> Zwick: </label>
+      <el-button @click="forwardStepZwick">></el-button>
+      <el-button @click="resetZwick">reset zwick</el-button>
     </div>
   </div>
 
@@ -172,6 +243,14 @@ function resetSpira(){
         nodeId, scale, x, y, config, textAnchor, dominantBaseline
       }"
     >
+    <text
+        x="0"
+        y="0"
+        :font-size="9 * scale"
+        text-anchor="middle"
+        dominant-baseline="central"
+        fill="#ffffff"
+      >{{ nodes[nodeId].name }}</text>
       <text
         x="0"
         y="0"
@@ -188,5 +267,4 @@ function resetSpira(){
     </template>
   </v-network-graph>
 </template>
-
 

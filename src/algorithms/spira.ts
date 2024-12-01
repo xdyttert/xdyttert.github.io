@@ -11,6 +11,7 @@ const lastNode: Node = ref({})
 
 function forward(vertex: Node){
     let edge = vertex.out.next()
+    console.log(edge)
     if (edge != null){
         edge.queueKey = vertex.distance + edge.weight
         P.queue(edge)
@@ -78,7 +79,7 @@ export function oneStepSpira(step: number, source: Node){
     }
 
     lastEdge.value.color = "green";
-    lastNode.value.color = "green"
+    lastNode.value.color = "green";
     if(solvedNum != vertexNum && P.length > 0){
         const edge = P.dequeue()
         edge.color = "red"

@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "element-plus": "^2.9.0",
     "heap": "^0.2.7",
     "heap-js": "^2.5.0",
     "ts-priority-queue": "^0.1.1",

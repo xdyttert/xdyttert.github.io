@@ -18,6 +18,10 @@ export class SortedLinkedList<T>{
         this.compareFunction = compareFunction
     }
 
+    public isLength1(): boolean{
+        return !this.isEmpty() && this.head?.next == null
+    }
+
     public isEmpty(): boolean{
         return this.head == null
     }
@@ -40,6 +44,22 @@ export class SortedLinkedList<T>{
         }
         node.next = currNode.next
         currNode.next = node
+    }
+
+    public deleteNode(data: T){
+        if (this.head == null) { return }
+        if (data == this.head.data){
+            this.head = this.head.next
+            return
+        }
+        let currNode = this.head
+        while(currNode.next != null){
+            if (data == currNode.next.data){
+                currNode.next = currNode.next.next
+                return
+            }
+            currNode = currNode.next
+        }
     }
 
     public next(): T | null{
