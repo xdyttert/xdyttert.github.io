@@ -1,12 +1,12 @@
 import './assets/main.css'
 
-import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
 import VNetworkGraph from "v-network-graph"
 import "v-network-graph/lib/style.css"
+import { createApp } from 'vue'
 import App from './App.vue'
-import data, { makeEdgesLists } from './data/data'
-import ElementPlus from 'element-plus';
-import 'element-plus/dist/index.css'
+import { makeEdgesLists } from './data/startingGraph'
 
 const app = createApp(App)
 makeEdgesLists()

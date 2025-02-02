@@ -1,5 +1,5 @@
 import { ref, type UnwrapRef } from "vue"
-import data from "./data"
+import data from "./startingGraph"
 
 
 class ListNode<T>{

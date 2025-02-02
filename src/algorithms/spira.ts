@@ -1,4 +1,4 @@
-import data from "@/data/data";
+import data from "@/data/startingGraph";
 import PriorityQueue from "ts-priority-queue";
 import { type Edge, type Node } from "v-network-graph";
 import { ref } from "vue";
@@ -13,9 +13,9 @@ function forward(vertex: Node){
     let edge = vertex.out.next()
     console.log(edge)
     if (edge != null){
-        edge.queueKey = vertex.distance + edge.weight
+        edge.queueKey = vertex.distanceSpira + edge.weight
         P.queue(edge)
-        edge.color = "gray"
+        edge.colorSpira = "gray"
     }
 }
 
@@ -25,14 +25,14 @@ export function spira(source: Node){
     let vertexNum = 0
     for(const key in data.nodes){
         const vertex = data.nodes[key]
-        vertex.distance = Infinity
+        vertex.distanceSpira = Infinity
         vertex.prev = null
         vertex.out.reset()
-        vertex.color = "blue"
+        vertex.colorSpira = "blue"
         vertex.solved = false
         vertexNum++
     }
-    source.distance = 0
+    source.distanceSpira = 0
     forward(source)
 
     while(solvedNum != vertexNum && P.length > 0){
@@ -41,7 +41,7 @@ export function spira(source: Node){
         const successor = data.nodes[edge.target]
         forward(vertex)
         if (!successor.solved){
-            successor.distance = vertex.distance + edge.weight
+            successor.distanceSpira = vertex.distanceSpira + edge.weight
             successor.prev = vertex
             solvedNum++
             successor.solved = true
@@ -50,7 +50,7 @@ export function spira(source: Node){
     }
     for(const key in data.nodes){
         const vertex = data.nodes[key]
-        vertex.color = "blue"
+        vertex.colorSpira = "blue"
     }
 }
 
@@ -63,35 +63,35 @@ export function oneStepSpira(step: number, source: Node){
         vertexNum = 0
         for(const key in data.nodes){
             const vertex = data.nodes[key]
-            vertex.distance = Infinity
+            vertex.distanceSpira = Infinity
             vertex.prev = null
             vertex.out.reset()
-            vertex.color = "blue"
+            vertex.colorSpira = "blue"
             vertex.solved = false
             vertexNum++
         }
         for (const key in data.edges){
-            data.edges[key].color = "blue"
+            data.edges[key].colorSpira = "blue"
         }
-        source.distance = 0
+        source.distanceSpira = 0
         forward(source)
         return
     }
 
-    lastEdge.value.color = "green";
-    lastNode.value.color = "green";
+    lastEdge.value.colorSpira = "green";
+    lastNode.value.colorSpira = "green";
     if(solvedNum != vertexNum && P.length > 0){
         const edge = P.dequeue()
-        edge.color = "red"
+        edge.colorSpira = "red"
         lastEdge.value = edge
         const vertex = data.nodes[edge.source]
-        vertex.color = "green"
+        vertex.colorSpira = "green"
         const successor = data.nodes[edge.target]
-        successor.color = "red"
+        successor.colorSpira = "red"
         lastNode.value = successor
         forward(vertex)
         if (!successor.solved){
-            successor.distance = vertex.distance + edge.weight
+            successor.distanceSpira = vertex.distanceSpira + edge.weight
             successor.prev = vertex
             solvedNum++
             successor.solved = true
