@@ -3,6 +3,7 @@ import { type Edges, type Layouts, type Node, type Nodes } from "v-network-graph
 import { inject, ref, type Ref } from "vue";
 import { SortedLinkedList } from "../data/linkedList";
 import data, { compareFunc } from "../data/startingGraph";
+import { updateNodes, updateEdges } from "../functionFiles/updateFunctions";
 
 const nodes: Nodes = inject("nodes")!
 const edges: Edges = inject("edges")!
@@ -18,11 +19,14 @@ const layouts: Layouts = inject("layouts")!
 function addNode() {
   const nodeId = `node${nextNodeIndex.value}`
   const name = `N${nextNodeIndex.value}`
-  data.nodes[nodeId] = { name, distanceDijkstra: 0, distanceSpira: 0, distanceZwick: 0, solved: false, prev: null, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", out: new SortedLinkedList<Node>(compareFunc), in: new SortedLinkedList<Node>(compareFunc) }
-  layouts.nodes[nodeId] = {x: 240, y: 15}
+  data.nodes[nodeId] = { name, distanceDijkstra: 0, distanceSpira: 0, distanceZwick: 0, 
+                         solved: false, prev: null, 
+                         colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", 
+                         out: new SortedLinkedList<Node>(compareFunc), in: new SortedLinkedList<Node>(compareFunc) }
+  layouts.nodes[nodeId] = {x: 360, y: -50}
   nextNodeIndex.value++
   console.log(data.layouts)
-  updateNodes()
+  updateNodes(nodes, data.nodes)
 }
 
 function removeNode() {
@@ -71,19 +75,6 @@ function removeEdge() {
   }
 }
 
-function updateNodes(){
-  for(const key in data.nodes){
-    delete nodes[key]
-    nodes[key] = data.nodes[key]
-  }
-}
-
-function updateEdges(){
-  for(const key in data.edges){
-    delete edges[key]
-    edges[key] = data.edges[key]
-  }
-}
 
 function updateEdgeWeight(){
   for(const edgeId of selectedEdges.value){
@@ -93,7 +84,7 @@ function updateEdgeWeight(){
     data.nodes[edges[edgeId].source].out.insertNode(edges[edgeId])
     data.nodes[edges[edgeId].target].in.insertNode(edges[edgeId])
   }
-  updateEdges();
+  updateEdges(edges, data.edges);
 }
 
 </script>
@@ -119,6 +110,7 @@ function updateEdgeWeight(){
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { da } from "element-plus/es/locales.mjs";
 
 export default defineComponent({
     name: "Header",

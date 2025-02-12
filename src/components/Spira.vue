@@ -4,6 +4,8 @@ import * as vNG from "v-network-graph";
 import { inject, ref, type Ref } from "vue";
 import { oneStepSpira, spira } from "../algorithms/spira";
 import data from "../data/startingGraph";
+import GraphAlgorithm from "./GraphAlgorithm.vue";
+import { updateNodes, updateEdges } from "../functionFiles/updateFunctions";
 
 
 const nodes: Nodes = inject("nodes")!
@@ -18,30 +20,16 @@ const spiraStep = ref(0)
 
 const layouts: Layouts = inject("layouts")!
 
-function updateNodes(){
-  for(const key in data.nodes){
-    delete nodes[key]
-    nodes[key] = data.nodes[key]
-  }
-}
-
-function updateEdges(){
-  for(const key in data.edges){
-    delete edges[key]
-    edges[key] = data.edges[key]
-  }
-}
-
 function handleSpira(){
   console.log(data.nodes)
   spira(data.nodes["node1"])
-  updateNodes()
+  updateNodes(nodes, data.nodes)
 }
 
 function forwardStepSpira(){
   oneStepSpira(spiraStep.value, data.nodes["node1"]);
-  updateNodes();
-  updateEdges();
+  updateNodes(nodes, data.nodes);
+  updateEdges(edges, data.edges);
   spiraStep.value++;
 }
 
@@ -51,60 +39,25 @@ function resetSpira(){
 </script>
 
 <template>
-  <div>
-    <div class="sectino">
-    <!-- SPIRA SECTION-->
-    <div class="row">
-      <!-- <el-button @click="handleSpira">run spira</el-button> -->
-       <label class="label label-colored"> Spira: </label>
-      <el-button @click="forwardStepSpira">></el-button>
-      <el-button @click="resetSpira">reset spira</el-button>
-    </div>
-  </div>
-  <div class="graph">
-  <v-network-graph
-    v-model:selected-nodes="selectedNodes"
-    v-model:selected-edges="selectedEdges"
-    ref="graph"
+  <GraphAlgorithm
+    label="Spira"
+    :forwardStep="forwardStepSpira"
+    :reset="resetSpira"
     :nodes="nodes"
     :edges="edges"
     :layouts="layouts"
     :configs="data.configsSpira"
-  >
-  <template
-      #override-node-label="{
-        nodeId, scale, x, y, config, textAnchor, dominantBaseline
-      }"
-    >
-    <text
-        x="0"
-        y="0"
-        :font-size="9 * scale"
-        text-anchor="middle"
-        dominant-baseline="central"
-        fill="#ffffff"
-      >{{ nodes[nodeId].name }}</text>
-      <text
-        x="0"
-        y="0"
-        :font-size="config.fontSize * scale"
-        :text-anchor="textAnchor"
-        :dominant-baseline="dominantBaseline"
-        :fill="config.color"
-        :transform="`translate(${x} ${y})`"
-      >{{ nodes[nodeId].distanceSpira }}</text>
-    </template>
+    :selected-nodes="selectedNodes"
+    :selected-edges="selectedEdges"
+    @update:selected-nodes="selectedNodes = $event"
+    @update:selected-edges="selectedEdges = $event"
+    distanceKey="distanceSpira"
+  />
+</template>  
 
-  <template #edge-label="{ edge, ...slotProps }">
-      <v-edge-label :text="edge.weight" align="center" vertical-align="above" v-bind="slotProps" />
-    </template>
-  </v-network-graph>
-  </div>
-  </div>
-</template>
-  
 <script lang="ts">
   import { defineComponent } from "vue";
+import { da } from "element-plus/es/locales.mjs";
   
   export default defineComponent({
     name: "Spira",
