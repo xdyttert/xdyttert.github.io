@@ -5,7 +5,7 @@ import { inject, ref, type Ref } from "vue";
 import { dijkstra, oneStepDijkstra } from "../algorithms/dijkstra";
 import data from "../data/startingGraph";
 import GraphAlgorithm from "./GraphAlgorithm.vue";
-import { updateNodes, updateEdges } from "../functionFiles/updateFunctions";
+import { updateNodes, updateEdges } from "../utils/utils";
 
 const nodes: Nodes = inject("nodes")!
 const edges: Edges = inject("edges")!
@@ -20,15 +20,8 @@ const dijkstraStep = ref(0)
 const layouts: Layouts = inject("layouts")!
 
 function handleDijkstra(){
-  dijkstra(data.nodes["node1"]);
-  updateNodes(nodes, data.nodes);
-}
-
-function forwardStepDijkstra(){
-  oneStepDijkstra(dijkstraStep.value, data.nodes["node1"]);
-  updateNodes(nodes, data.nodes);
-  updateEdges(edges, data.edges);
-  dijkstraStep.value++;
+  dijkstra(data.nodes["node1"], nodes, edges);
+  updateNodes(nodes);
 }
 
 function resetDijkstra(){
@@ -43,7 +36,8 @@ function print(){
 <template>
   <GraphAlgorithm
     label="Dijkstra"
-    :forwardStep="forwardStepDijkstra"
+    :algorithm="oneStepDijkstra"
+    :step="ref(dijkstraStep)"
     :reset="resetDijkstra"
     :nodes="nodes"
     :edges="edges"

@@ -5,7 +5,7 @@ import { inject, ref, type Ref } from "vue";
 import { oneStepZwick, zwick } from "../algorithms/zwick";
 import data from "../data/startingGraph";
 import GraphAlgorithm from "./GraphAlgorithm.vue";
-import { updateNodes, updateEdges } from "../functionFiles/updateFunctions";
+import { updateNodes, updateEdges } from "../utils/utils";
 
 const nodes: Nodes = inject("nodes")!
 const edges: Edges = inject("edges")!
@@ -22,15 +22,8 @@ const layouts: Layouts = inject("layouts")!
 
 function handleZwick(){
   console.log(data.nodes)
-  zwick(data.nodes["node1"])
- updateNodes(nodes, data.nodes)
-}
-
-function forwardStepZwick(){
-  zwickInnerCycle = oneStepZwick(zwickStep.value, data.nodes["node1"], zwickInnerCycle);
-  updateNodes(nodes, data.nodes);
-  updateEdges(edges, data.edges);
-  zwickStep.value++;
+  zwick(data.nodes["node1"], nodes, edges)
+ updateNodes(nodes)
 }
 
 function resetZwick(){
@@ -41,7 +34,8 @@ function resetZwick(){
 <template>
   <GraphAlgorithm
     label="Wilson-Zwick"
-    :forwardStep="forwardStepZwick"
+    :algorithm="oneStepZwick"
+    :step="ref(zwickStep)"
     :reset="resetZwick"
     :nodes="nodes"
     :edges="edges"

@@ -1,9 +1,43 @@
-<template>
+<script setup lang="ts">
+import { type Nodes, type Edges } from "v-network-graph";
+import { defineProps, defineEmits, type Ref, ref, provide, inject } from "vue";
+import { forwardStepAlgorithm } from "../utils/utils";
+
+const startingNodeName: Ref<string> = inject("startingNodeName")!
+  
+  const props = defineProps<{
+    label: String,
+    algorithm: Function,
+    step: Ref<number>,
+    reset: Function,
+    nodes: Nodes,
+    edges: Edges,
+    layouts: Object,
+    configs: Object,
+    selectedNodes: Array<string>,
+    selectedEdges: Array<string>,
+    distanceKey: String,
+  }>();
+
+  const key = props.distanceKey as keyof Node
+  
+  const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
+  
+  const updateSelectedNodes = (newValue: Ref<string[], string[]>) => {
+    emit("update:selectedNodes", newValue);
+  };
+  
+  const updateSelectedEdges = (newValue: Ref<string[], string[]>) => {
+    emit("update:selectedEdges", newValue);
+  };
+  </script>
+  
+  <template>
     <div>
       <div class="section">
         <div class="row">
           <label class="label label-colored"> {{ label }}: </label>
-          <el-button @click="forwardStep">></el-button>
+          <el-button @click="forwardStepAlgorithm(algorithm, step, ref(startingNodeName), nodes, edges)">></el-button>
           <el-button @click="reset">reset {{ label }}</el-button>
         </div>
       </div>
@@ -37,37 +71,6 @@
       </div>
     </div>
   </template>
-  
-  <script setup lang="ts">
-  import { type Nodes, type Edges } from "v-network-graph";
-import { defineProps, defineEmits, type Ref } from "vue";
-  
-  const props = defineProps<{
-    label: String,
-    forwardStep: Function,
-    reset: Function,
-    nodes: Nodes,
-    edges: Edges,
-    layouts: Object,
-    configs: Object,
-    selectedNodes: Array<string>, // Should be an array
-    selectedEdges: Array<string>, // Should be an array
-    distanceKey: String,
-  }>();
-
-  const key = props.distanceKey as keyof Node
-  
-  const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
-  
-  const updateSelectedNodes = (newValue: Ref<string[], string[]>) => {
-    emit("update:selectedNodes", newValue);
-  };
-  
-  const updateSelectedEdges = (newValue: Ref<string[], string[]>) => {
-    emit("update:selectedEdges", newValue);
-  };
-  </script>
-  
 
   <script lang="ts">
   import { defineComponent } from "vue";

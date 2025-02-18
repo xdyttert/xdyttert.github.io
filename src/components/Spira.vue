@@ -5,7 +5,7 @@ import { inject, ref, type Ref } from "vue";
 import { oneStepSpira, spira } from "../algorithms/spira";
 import data from "../data/startingGraph";
 import GraphAlgorithm from "./GraphAlgorithm.vue";
-import { updateNodes, updateEdges } from "../functionFiles/updateFunctions";
+import { updateNodes, updateEdges } from "../utils/utils";
 
 
 const nodes: Nodes = inject("nodes")!
@@ -22,14 +22,14 @@ const layouts: Layouts = inject("layouts")!
 
 function handleSpira(){
   console.log(data.nodes)
-  spira(data.nodes["node1"])
-  updateNodes(nodes, data.nodes)
+  spira(data.nodes["node1"], nodes, edges)
+  updateNodes(nodes)
 }
 
 function forwardStepSpira(){
-  oneStepSpira(spiraStep.value, data.nodes["node1"]);
-  updateNodes(nodes, data.nodes);
-  updateEdges(edges, data.edges);
+  oneStepSpira(spiraStep.value, data.nodes["node1"], nodes, edges);
+  updateNodes(nodes);
+  updateEdges(edges);
   spiraStep.value++;
 }
 
@@ -41,7 +41,8 @@ function resetSpira(){
 <template>
   <GraphAlgorithm
     label="Spira"
-    :forwardStep="forwardStepSpira"
+    :algorithm="oneStepSpira"
+    :step="ref(spiraStep)"
     :reset="resetSpira"
     :nodes="nodes"
     :edges="edges"

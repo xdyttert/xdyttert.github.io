@@ -1,22 +1,24 @@
 import data, { compareFunc } from "@/data/startingGraph"
 import { SortedLinkedList } from "@/data/linkedList"
 import PriorityQueue from "ts-priority-queue"
-import type { Edge, Node } from "v-network-graph"
+import type { Edge, Edges, Node, Nodes } from "v-network-graph"
 import { ref } from "vue"
 
+let innerCycle: boolean = false
 
-function getEdge(sourceId: string, targetId: String){
-    for (const key in data.edges){
-        let edge = data.edges[key]
+
+function getEdge(sourceId: string, targetId: String, nodes: Nodes, edges: Edges){
+    for (const key in edges){
+        let edge = edges[key]
         if (edge.source == sourceId && edge.target == targetId){
             return edge
         }
     }
 }
 
-function getNodeId(node: Node){
-    for (const key in data.nodes){
-        if (data.nodes[key] == node){
+function getNodeId(node: Node, nodes: Nodes){
+    for (const key in nodes){
+        if (nodes[key] == node){
             return key
         }
     }
@@ -64,8 +66,8 @@ function backward(vertex: Node){
     }
 }
 
-function request(vertex: Node, successor: Node){
-    let edge = getEdge(getNodeId(vertex), getNodeId(successor))
+function request(vertex: Node, successor: Node, nodes: Nodes, edges: Edges){
+    let edge = getEdge(getNodeId(vertex, nodes), getNodeId(successor, nodes), nodes, edges)
     vertex.req.insertNode(edge)
     if (vertex.req.isLength1()){
         vertex.req.reset()
@@ -76,16 +78,16 @@ function request(vertex: Node, successor: Node){
     } 
 }
 
-export function zwick(source: Node){
-    console.log(data.nodes)
-    console.log(data.edges)
+export function zwick(source: Node, nodes: Nodes, edges: Edges){
+    console.log(nodes)
+    console.log(edges)
     M = Infinity
     P.clear()
     Q.clear()
     vertexNum = 0
     solvedNum = 0
-    for(const key in data.nodes){
-        const vertex = data.nodes[key]
+    for(const key in nodes){
+        const vertex = nodes[key]
         vertex.distanceZwick = Infinity
         vertex.prev = null
         vertex.out.reset()
@@ -105,8 +107,8 @@ export function zwick(source: Node){
     while (solvedNum != vertexNum && P.length > 0){
 
         let edge = P.dequeue()
-        let vertex = data.nodes[edge.source]
-        let successor = data.nodes[edge.target]
+        let vertex = nodes[edge.source]
+        let successor = nodes[edge.target]
         forward(vertex)
 
         if (!successor.solved){
@@ -118,8 +120,8 @@ export function zwick(source: Node){
 
             if (solvedNum == Math.ceil(vertexNum / 2)){
                 M = successor.distanceZwick
-                for (const key in data.nodes){
-                    let notSolvedVertex = data.nodes[key]
+                for (const key in nodes){
+                    let notSolvedVertex = nodes[key]
 
                     if (!notSolvedVertex.solved){
                         backward(notSolvedVertex)
@@ -130,21 +132,22 @@ export function zwick(source: Node){
 
         while (Q.length > 0 && Q.peek().queueKey < 2 * ((P.length > 0 ? P.peek().queueKey : Infinity) - M)){
             let edge = Q.dequeue()
-            let vertex = data.nodes[edge.source]
-            let successor = data.nodes[edge.target]
+            let vertex = nodes[edge.source]
+            let successor = nodes[edge.target]
 
             if (!successor.solved){
                 backward(successor)
-                request(vertex, successor)
+                request(vertex, successor, nodes, edges)
             }
         }
     }
 }
 
-export function oneStepZwick(step: number, source: Node, innerCycle: boolean){
+export function oneStepZwick(step: number, source: Node, nodes: Nodes, edges: Edges){
     console.log(P)
     console.log(Q)
     if (step == 0){
+        innerCycle = false
         lastEdgesGreen.value = []
         lastEdgesBlue.value = []
         lastNodeGreen.value = {}
@@ -154,8 +157,8 @@ export function oneStepZwick(step: number, source: Node, innerCycle: boolean){
         P.clear()
         Q.clear()
         M = Infinity
-        for(const key in data.nodes){
-            const vertex = data.nodes[key]
+        for(const key in nodes){
+            const vertex = nodes[key]
             vertex.distanceZwick = Infinity
             vertex.prev = null
             vertex.out.reset()
@@ -167,8 +170,8 @@ export function oneStepZwick(step: number, source: Node, innerCycle: boolean){
             vertex.activate = false
             vertexNum++
         }
-        for (const key in data.edges){
-            data.edges[key].colorZwick = "blue"
+        for (const key in edges){
+            edges[key].colorZwick = "blue"
         }
         source.distanceZwick = 0
         source.solved = true
@@ -189,9 +192,9 @@ export function oneStepZwick(step: number, source: Node, innerCycle: boolean){
             let edge = P.dequeue()
             lastEdgesGreen.value.push(edge)
             edge.colorZwick = "red"
-            let vertex = data.nodes[edge.source]
+            let vertex = nodes[edge.source]
             vertex.colorZwick = "green"
-            let successor = data.nodes[edge.target]
+            let successor = nodes[edge.target]
             successor.colorZwick = "red"
             lastNodeGreen.value = successor
             forward(vertex)
@@ -206,8 +209,8 @@ export function oneStepZwick(step: number, source: Node, innerCycle: boolean){
                 if (solvedNum == Math.ceil(vertexNum / 2)){
                     M = successor.distanceZwick
                     console.log(M)
-                    for (const key in data.nodes){
-                        let notSolvedVertex = data.nodes[key]
+                    for (const key in nodes){
+                        let notSolvedVertex = nodes[key]
 
                         if (!notSolvedVertex.solved){
                             backward(notSolvedVertex)
@@ -223,9 +226,9 @@ export function oneStepZwick(step: number, source: Node, innerCycle: boolean){
         let edge = Q.dequeue()
         edge.colorZwick = "magenta"
         lastEdgesBlue.value.push(edge)
-        let vertex = data.nodes[edge.source]
+        let vertex = nodes[edge.source]
         //vertex.colorZwick = "green"
-        let successor = data.nodes[edge.target]
+        let successor = nodes[edge.target]
         successor.colorZwick = "magenta"
         if (successor.solved){
             lastNodeGreen.value = successor
@@ -237,7 +240,7 @@ export function oneStepZwick(step: number, source: Node, innerCycle: boolean){
         }
         if (!successor.solved){
             backward(successor)
-            request(vertex, successor)
+            request(vertex, successor, nodes, edges)
         }
     }
     return (Q.length > 0 && Q.peek().queueKey < 2 * ((P.length > 0 ? P.peek().queueKey : Infinity) - M))

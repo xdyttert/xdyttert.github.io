@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { defineComponent, ref, type Ref } from "vue";
+import type { Layouts } from "v-network-graph";
+import { defineComponent, provide, reactive, ref, type Ref } from "vue";
 import Dijkstra from "./components/Dijkstra.vue";
+import Header from "./components/Header.vue";
 import Spira from "./components/Spira.vue";
 import Zwick from "./components/Zwick.vue";
-import Header from "./components/Header.vue";
-import { provide, reactive } from "vue";
-import data, { compareFunc } from "./data/startingGraph";
+import data from "./data/startingGraph";
 
 const selectedNodes = ref<string[]>([])
 const selectedEdges = ref<string[]>([])
@@ -19,9 +19,13 @@ const edges = reactive({ ...data.edges })
 provide("nodes", nodes)
 provide("edges", edges)
 
-const layouts = reactive({...data.layouts})
+const layouts = reactive({ ...data.layouts })
 
 provide("layouts", layouts)
+
+const startingNodeName: Ref<string> = ref("N1")
+
+provide("startingNodeName", startingNodeName)
 
 </script>
 
@@ -69,21 +73,24 @@ export default defineComponent({
   box-shadow: 0 1px 1px rgba(40, 39, 39, 0.1);
 }
 .text-input{
-    max-width: 50px;
-  }
-  .row {
-    display: flex; /* Use flexbox for row alignment */
-    align-items: center; /* Vertically center label and button */
-    gap: 10px; /* Space between label and button */
-  }
-  .label {
-    min-width: 55px; /* Set consistent label width */
-    text-align: center; /* Right-align label text */
-  }
-  .label-colored{
-    color: #1e00ff;
-  }
-  .graph {
+  max-width: 50px;
+}
+.selection{
+  max-width: 70px;
+}
+.row {
+  display: flex; /* Use flexbox for row alignment */
+  align-items: center; /* Vertically center label and button */
+  gap: 10px; /* Space between label and button */
+}
+.label {
+  min-width: 55px; /* Set consistent label width */
+  text-align: center; /* Right-align label text */
+}
+.label-colored{
+  color: #1e00ff;
+}
+.graph {
   flex: 1; /* Allow the graph to expand and fill available space */
   display: flex;
   float: center;
