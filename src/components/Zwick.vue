@@ -20,12 +20,6 @@ let zwickInnerCycle = true
 
 const layouts: Layouts = inject("layouts")!
 
-function handleZwick(){
-  console.log(data.nodes)
-  zwick(data.nodes["node1"], nodes, edges)
- updateNodes(nodes)
-}
-
 function resetZwick(){
   zwickStep.value = 0
 }

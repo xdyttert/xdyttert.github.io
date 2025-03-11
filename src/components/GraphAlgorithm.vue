@@ -8,8 +8,6 @@ const startingNodeName: Ref<string> = inject("startingNodeName")!
   const props = defineProps<{
     label: String,
     algorithm: Function,
-    step: Ref<number>,
-    reset: Function,
     nodes: Nodes,
     edges: Edges,
     layouts: Object,
@@ -26,6 +24,7 @@ const startingNodeName: Ref<string> = inject("startingNodeName")!
   const PKeyt = props.PKey as keyof Edge
   const Q = "Q"
   const P = "P"
+  let step = 0
   
   
   const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
@@ -37,6 +36,11 @@ const startingNodeName: Ref<string> = inject("startingNodeName")!
   const updateSelectedEdges = (newValue: Ref<string[], string[]>) => {
     emit("update:selectedEdges", newValue);
   };
+
+  function resetS(algorithm: Function, nodes: Nodes, edges: Edges){
+      step = 0
+      step = forwardStepAlgorithm(algorithm, step, ref(startingNodeName), nodes, edges)
+  }
   </script>
   
   <template>
@@ -44,8 +48,8 @@ const startingNodeName: Ref<string> = inject("startingNodeName")!
       <div class="section">
         <div class="row">
           <label class="label label-colored"> {{ label }}: </label>
-          <el-button @click="forwardStepAlgorithm(algorithm, step, ref(startingNodeName), nodes, edges)">></el-button>
-          <el-button @click="reset">reset {{ label }}</el-button>
+          <el-button @click="step = forwardStepAlgorithm(algorithm, step, ref(startingNodeName), nodes, edges)">></el-button>
+          <el-button @click="resetS(algorithm, nodes, edges)">reset {{ label }}</el-button>
         </div>
       </div>
   

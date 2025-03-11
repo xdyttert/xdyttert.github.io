@@ -15,17 +15,19 @@ export function updateEdges(edges: Edges){
     }
 }
 
-export function forwardStepAlgorithm(algorithm: Function, step: Ref<number>, 
+export function forwardStepAlgorithm(algorithm: Function, step: number, 
                                      startingNodeName: Ref<string>,
                                      nodes: Nodes, edges: Edges){
-    if (step.value == 0){
+    console.log("pri algoritme", step)
+    if (step == 0){
         startingNode = findNodeByName(nodes, startingNodeName.value)
     }
-    console.log(step.value)
-    algorithm(step.value, startingNode, nodes, edges);
+    algorithm(step, startingNode, nodes, edges);
     updateNodes(nodes);
     updateEdges(edges);
-    step.value++;
+    console.log("po algoritme", step)
+    console.log(step)
+    return step + 1;
 }
 
 function findNodeByName(nodes: Nodes, name: string){

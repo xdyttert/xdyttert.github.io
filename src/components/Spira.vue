@@ -20,19 +20,6 @@ const spiraStep = ref(0)
 
 const layouts: Layouts = inject("layouts")!
 
-function handleSpira(){
-  console.log(data.nodes)
-  spira(data.nodes["node1"], nodes, edges)
-  updateNodes(nodes)
-}
-
-function forwardStepSpira(){
-  oneStepSpira(spiraStep.value, data.nodes["node1"], nodes, edges);
-  updateNodes(nodes);
-  updateEdges(edges);
-  spiraStep.value++;
-}
-
 function resetSpira(){
   spiraStep.value = 0
 }
@@ -60,7 +47,6 @@ function resetSpira(){
 
 <script lang="ts">
   import { defineComponent } from "vue";
-import { da } from "element-plus/es/locales.mjs";
   
   export default defineComponent({
     name: "Spira",

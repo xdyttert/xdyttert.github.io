@@ -19,17 +19,10 @@ const dijkstraStep = ref(0)
 
 const layouts: Layouts = inject("layouts")!
 
-function handleDijkstra(){
-  dijkstra(data.nodes["node1"], nodes, edges);
-  updateNodes(nodes);
-}
-
 function resetDijkstra(){
   dijkstraStep.value = 0
-}
-
-function print(){
-  console.log(selectedNodes.value)
+  console.log("restDijkstra")
+  console.log(dijkstraStep.value)
 }
 </script>
 

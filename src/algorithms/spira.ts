@@ -11,7 +11,6 @@ const lastNode: Node = ref({})
 
 function forward(vertex: Node){
     let edge = vertex.out.next()
-    console.log(edge)
     if (edge != null){
         edge.queueKey = vertex.distanceSpira + edge.weight
         P.queue(edge)
@@ -26,10 +25,10 @@ export function spira(source: Node, nodes: Nodes, edges: Edges){
     for(const key in nodes){
         const vertex = nodes[key]
         vertex.distanceSpira = Infinity
-        vertex.prev = null
+        vertex.prevSpira = null
         vertex.out.reset()
         vertex.colorSpira = "blue"
-        vertex.solved = false
+        vertex.solvedSpira = false
         vertexNum++
     }
     source.distanceSpira = 0
@@ -40,11 +39,11 @@ export function spira(source: Node, nodes: Nodes, edges: Edges){
         const vertex = nodes[edge.source]
         const successor = nodes[edge.target]
         forward(vertex)
-        if (!successor.solved){
+        if (!successor.solvedSpira){
             successor.distanceSpira = vertex.distanceSpira + edge.weight
-            successor.prev = vertex
+            successor.prevSpira = vertex
             solvedNum++
-            successor.solved = true
+            successor.solvedSpira = true
             forward(successor)
         }
     }
@@ -55,6 +54,10 @@ export function spira(source: Node, nodes: Nodes, edges: Edges){
 }
 
 export function oneStepSpira(step: number, source: Node, nodes: Nodes, edges: Edges){
+    console.log("bezi spira")
+    console.log(source)
+    console.log(nodes)
+    console.log(step)
     if (step == 0){
         P.clear()
         lastEdge.value = {}
@@ -64,10 +67,10 @@ export function oneStepSpira(step: number, source: Node, nodes: Nodes, edges: Ed
         for(const key in nodes){
             const vertex = nodes[key]
             vertex.distanceSpira = Infinity
-            vertex.prev = null
+            vertex.prevSpira = null
             vertex.out.reset()
             vertex.colorSpira = "blue"
-            vertex.solved = false
+            vertex.solvedSpira = false
             vertexNum++
         }
         for (const key in edges){
@@ -90,11 +93,11 @@ export function oneStepSpira(step: number, source: Node, nodes: Nodes, edges: Ed
         successor.colorSpira = "red"
         lastNode.value = successor
         forward(vertex)
-        if (!successor.solved){
+        if (!successor.solvedSpira){
             successor.distanceSpira = vertex.distanceSpira + edge.weight
-            successor.prev = vertex
+            successor.prevSpira = vertex
             solvedNum++
-            successor.solved = true
+            successor.solvedSpira = true
             forward(successor)
         }
     }
