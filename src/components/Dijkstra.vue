@@ -48,6 +48,8 @@ function print(){
     @update:selected-nodes="selectedNodes = $event"
     @update:selected-edges="selectedEdges = $event"
     distanceKey="distanceDijkstra"
+    QKey="isInQDijkstra"
+    PKey="isInPDijkstra"
   />
 </template>
   

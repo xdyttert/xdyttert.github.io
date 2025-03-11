@@ -17,18 +17,18 @@ const nodes: Nodes = {
 }
 
 const edges: Edges = {
-  edge1: { source: "node1", target: "node2", weight: 5, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge2: { source: "node2", target: "node3", weight: 7, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge3: { source: "node2", target: "node4", weight: 2, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge4: { source: "node2", target: "node5", weight: 3, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge5: { source: "node5", target: "node6", weight: 2, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge6: { source: "node5", target: "node7", weight: 8, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge7: { source: "node3", target: "node7", weight: 2, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge8: { source: "node4", target: "node9", weight: 1, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge9: { source: "node7", target: "node9", weight: 3, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge10: { source: "node4", target: "node8", weight: 1, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge11: { source: "node8", target: "node9", weight: 5, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
-  edge12: { source: "node8", target: "node3", weight: 3, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0 },
+  edge1: { source: "node1", target: "node2", weight: 5, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge2: { source: "node2", target: "node3", weight: 7, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge3: { source: "node2", target: "node4", weight: 2, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge4: { source: "node2", target: "node5", weight: 3, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge5: { source: "node5", target: "node6", weight: 2, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge6: { source: "node5", target: "node7", weight: 8, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge7: { source: "node3", target: "node7", weight: 2, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge8: { source: "node4", target: "node9", weight: 1, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge9: { source: "node7", target: "node9", weight: 3, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge10: { source: "node4", target: "node8", weight: 1, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge11: { source: "node8", target: "node9", weight: 5, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge12: { source: "node8", target: "node3", weight: 3, colorDijkstra: "blue",colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
 }
 
 const layouts: Layouts = {

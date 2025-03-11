@@ -46,6 +46,8 @@ function resetZwick(){
     @update:selected-nodes="selectedNodes = $event"
     @update:selected-edges="selectedEdges = $event"
     distanceKey="distanceZwick"
+    QKey="isInQZwick"
+    PKey="isInPZwick"
   />
 </template>
   

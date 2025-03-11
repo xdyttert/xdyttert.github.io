@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Nodes, type Edges } from "v-network-graph";
+import { type Nodes, type Edges, type Edge, type Node } from "v-network-graph";
 import { defineProps, defineEmits, type Ref, ref, provide, inject } from "vue";
 import { forwardStepAlgorithm } from "../utils/utils";
 
@@ -17,9 +17,16 @@ const startingNodeName: Ref<string> = inject("startingNodeName")!
     selectedNodes: Array<string>,
     selectedEdges: Array<string>,
     distanceKey: String,
+    QKey: String,
+    PKey: String,
   }>();
 
-  const key = props.distanceKey as keyof Node
+  const distanceKeyt = props.distanceKey as keyof Node
+  const QKeyt = props.QKey as keyof Edge
+  const PKeyt = props.PKey as keyof Edge
+  const Q = "Q"
+  const P = "P"
+  
   
   const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
   
@@ -54,18 +61,22 @@ const startingNodeName: Ref<string> = inject("startingNodeName")!
           @update:selected-edges="updateSelectedEdges"
           ref="graph"
         >
+        
           <template #override-node-label="{ nodeId, scale, x, y, config, textAnchor, dominantBaseline }">
             <text x="0" y="0" :font-size="9 * scale" text-anchor="middle" dominant-baseline="central" fill="#ffffff">
               {{ nodes[nodeId].name }}
             </text>
             <text x="0" y="0" :font-size="config.fontSize * scale" :text-anchor="textAnchor"
               :dominant-baseline="dominantBaseline" :fill="config.color" :transform="`translate(${x} ${y})`">
-              {{ nodes[nodeId][key] }}
+              {{ nodes[nodeId][distanceKeyt] }}
             </text>
           </template>
   
           <template #edge-label="{ edge, ...slotProps }">
-            <v-edge-label :text="edge.weight" align="center" vertical-align="above" v-bind="slotProps" />
+            <v-edge-label :text="edge.weight" align="center" vertical-align="above" v-bind="slotProps"/>
+            <v-edge-label :text="Q" text-anchor="start" vertical-align="below" v-if="edge[QKeyt]" v-bind="slotProps"/>
+            <v-edge-label :text="P" text-anchor="end" dx="-10" vertical-align="below" v-if="edge[PKeyt]" v-bind="slotProps"/>
+            
           </template>
         </v-network-graph>
       </div>

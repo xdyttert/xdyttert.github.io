@@ -53,6 +53,8 @@ function resetSpira(){
     @update:selected-nodes="selectedNodes = $event"
     @update:selected-edges="selectedEdges = $event"
     distanceKey="distanceSpira"
+    QKey="isInQSpira"
+    PKey="isInPSpira"
   />
 </template>  
 
