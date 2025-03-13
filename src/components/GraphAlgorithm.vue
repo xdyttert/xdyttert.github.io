@@ -45,11 +45,11 @@ const startingNodeName: Ref<string> = inject("startingNodeName")!
   
   <template>
     <div>
-      <div class="section">
-        <div class="row">
+      <div class="section-header">
+        <div>
           <label class="label label-colored"> {{ label }}: </label>
           <el-button @click="step = forwardStepAlgorithm(algorithm, step, ref(startingNodeName), nodes, edges)">></el-button>
-          <el-button @click="resetS(algorithm, nodes, edges)">reset {{ label }}</el-button>
+          <el-button @click="resetS(algorithm, nodes, edges)">reset</el-button>
         </div>
       </div>
   
@@ -94,3 +94,13 @@ const startingNodeName: Ref<string> = inject("startingNodeName")!
     name: "GraphAlgorithm",
   });
 </script>
+
+<style scoped>
+.section-header{
+  background-color: #F2D45C;
+  padding: 5px;
+  font-size: 20px;
+  gap: 5px;
+  display: flex;
+}
+</style>

@@ -6,6 +6,7 @@ import Header from "./components/Header.vue";
 import Spira from "./components/Spira.vue";
 import Zwick from "./components/Zwick.vue";
 import data from "./data/startingGraph";
+import { tr } from "element-plus/es/locales.mjs";
 
 const selectedNodes = ref<string[]>([])
 const selectedEdges = ref<string[]>([])
@@ -27,16 +28,23 @@ const startingNodeName: Ref<string> = ref("N1")
 
 provide("startingNodeName", startingNodeName)
 
+const show = reactive({
+    dijkstra: true,
+    spira: true,
+    zwick: true
+})
+provide("show", show)
+
+
 </script>
 
 <template> 
-  
   <div id="app">
     <Header />
     <div class="container">
-      <Dijkstra class="section"/> 
-      <Spira class="section"/>
-      <Zwick class="section"/>
+      <Dijkstra class="section" v-if="show.dijkstra"/> 
+      <Spira class="section" v-if="show.spira"/>
+      <Zwick class="section" v-if="show.zwick"/>
     </div>
   </div>
 </template>
@@ -57,26 +65,16 @@ export default defineComponent({
 <style>
 /* Global Grid Layout for Three Columns */
 .container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; /* Each column takes up equal space */
-  gap: 1rem; /* Spacing between columns */
-  height: 100vh; /* Full-height layout */
-  padding: 1rem;
-  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
 /* Optional: Styling for each section */
 .section {
-  background-color: #888686;
-  padding: 0rem;
-  border-radius: 1px;
-  box-shadow: 0 1px 1px rgba(40, 39, 39, 0.1);
-}
-.text-input{
-  max-width: 50px;
-}
-.selection{
-  max-width: 70px;
+  flex: 1;
+  border: 1px solid #000000;
+  min-width: 0;
 }
 .row {
   display: flex; /* Use flexbox for row alignment */
@@ -86,9 +84,7 @@ export default defineComponent({
 .label {
   min-width: 55px; /* Set consistent label width */
   text-align: center; /* Right-align label text */
-}
-.label-colored{
-  color: #1e00ff;
+  color: #000000;
 }
 .graph {
   flex: 1; /* Allow the graph to expand and fill available space */
@@ -102,15 +98,14 @@ export default defineComponent({
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   height: 100%;
 }
-.header {
-  width: 100%;
-  background-color: #007bff;
-  color: white;
-  text-align: center;
-  padding: 0rem;
-  font-size: 1.5rem;
+.el-button {
+  color: #000000;
   font-weight: bold;
-  align-content: center;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  border: 0.5px solid #000000;
+}
+.el-button:disabled {
+  opacity: 1;
+  font-weight: bold;
+  border: 0.5px solid #000000;
 }
 </style>

@@ -18,6 +18,8 @@ const layouts: Layouts = inject("layouts")!
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
 
+const show = inject("show")!
+
 function addNode() {
   const nodeId = `node${nextNodeIndex.value}`
   const name = `N${nextNodeIndex.value}`
@@ -40,9 +42,11 @@ function removeNode() {
     for (const key in edges){
       if (edges[key].source == nodeId){
         selectedEdges.value.push(key)
+        pastSelectedEdges = pastSelectedEdges.filter(x => x != key)
       }
       if (edges[key].target == nodeId){
         selectedEdges.value.push(key)
+        pastSelectedEdges = pastSelectedEdges.filter(x => x != key)
       }
     }
     removeEdge()
@@ -51,6 +55,7 @@ function removeNode() {
   }
   selectedNodes.value = []
   selectedEdges.value = pastSelectedEdges
+  console.log(selectedEdges)
 }
 
 function addEdge() {
@@ -76,6 +81,7 @@ function removeEdge() {
     // delete data.edges[edgeId]
     delete edges[edgeId]
   }
+  selectedEdges.value = []
 }
 
 
@@ -90,32 +96,54 @@ function updateEdgeWeight(){
   updateEdges(edges);
 }
 
+
 </script>
 
 <template>
-<div class="header">
-  <label class="label">Node: </label>
-  <el-button @click="addNode">add</el-button>
-  <el-button :disabled="selectedNodes.length == 0" @click="removeNode">remove</el-button>
+  <div class="header">
+    <!-- NODES AND EDGES -->
+    <div class="graph-manipulation">
+      <div class="nodes">
+        <el-button class="equal-btn" @click="addNode">add node</el-button>
+        <el-button class="equal-btn" :disabled="selectedNodes.length == 0" @click="removeNode">remove node</el-button>
+      </div>
+      <div class="edges">
+        <el-button :disabled="selectedNodes.length != 2" @click="addEdge">add edge</el-button>
+        <el-button :disabled="selectedEdges.length == 0" @click="removeEdge">remove edge</el-button>
+      </div>
+    
+      <div class="edge-weight">
+        <el-button :disabled="selectedEdges.length == 0" @click="updateEdgeWeight">update edge weight</el-button>
+        <input class="text-input" type="integer" id="weightInput" placeholder="input new edge weight">
+      </div>
 
-  <label class="label">Edge: </label>
-  <el-button :disabled="selectedNodes.length != 2" @click="addEdge">add</el-button>
-  <el-button :disabled="selectedEdges.length == 0" @click="removeEdge">remove</el-button>
+      <div>
+        <label class="label">Starting node: </label>
+        <el-select class="selection" 
+                  v-model="startingNodeName">
+          <el-option class="option" v-for="node in nodes"
+          :key="node.id"
+          :label="node.name"
+          :value="node.name"
+          >
+          </el-option>
+        </el-select>
+      </div>
+    </div>
+    <!-- SWITCHING OFF COMPONENTS -->
+    <div class="toggles">
+      <label class="label label-colored"> Dijkstra section: </label>
+      <div class="toggle" :class="{ active: show.dijkstra }" @click="show.dijkstra = !show.dijkstra"> {{ show.dijkstra ? "✔" : "✖" }} </div>
 
-  <input class="text-input" type="integer" id="weightInput">
-  <el-button @click="updateEdgeWeight">update edge weight</el-button>
+      <label class="label label-colored"> Spira section: </label>
+      <div class="toggle" :class="{ active: show.spira }" @click="show.spira = !show.spira"> {{ show.spira ? "✔" : "✖" }} </div>
 
-  <label class="label">Starting node: </label>
-  <el-select class="selection" 
-             v-model="startingNodeName">
-    <el-option v-for="node in nodes"
-    :key="node.id"
-    :label="node.name"
-    :value="node.name"
-    >
-    </el-option>
-  </el-select>
-</div>
+      <label class="label label-colored"> Wilson-Zwick section: </label>
+      <div class="toggle" :class="{ active: show.zwick }" @click="show.zwick = !show.zwick"> {{ show.zwick ? "✔" : "✖" }} </div>
+    </div>
+    <!-- <label>{{ selectedEdges }}</label>
+    <label>{{ selectedNodes }}</label> -->
+  </div>
 </template>
 
 <script lang="ts">
@@ -123,5 +151,84 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
     name: "Header",
-})
+  }
+)
 </script>
+
+<style scoped>
+.header {
+  display: flex;
+  justify-content: space-between; /* Ensure even spacing */
+  align-items: center; /* Align items vertically */
+  gap: 20px; /* Space between sections */
+  flex-wrap: wrap; /* Prevents breaking on small screens */
+  background-color: #F2D45C;
+  padding: 5px;
+  font-size: 20px;
+  border: 1px solid #000000;
+}
+.graph-manipulation {
+  display: flex;
+  gap: 20px; /* Space between buttons */
+}
+.toggles {
+  display: flex;
+  gap: 10px;
+  align-items: center; /* Align toggle buttons with labels */
+}
+.toggle {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #000000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000;
+  border-radius: 5px;
+  user-select: none;
+}
+.nodes {
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  gap: 3px;
+}
+.equal-btn {
+  width: 100 !important;
+  text-align: center;
+}
+.edges {
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  gap: 3px;
+}
+.edge-weight {
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  gap: 3px;
+}
+.selection{
+  max-width: 80px;
+  color: #000000;
+  border: 0.5px solid #000000;
+  border-radius: 5px;
+}
+.option {
+  color: #000000;
+}
+::v-deep(.el-select .el-select__selected-item) {
+  color: #000000 !important;
+}
+.text-input{
+  height: 32px;
+  border: 0.5px solid #000000;
+  border-radius: 5px;
+  text-align: center;
+}
+</style>
