@@ -5,6 +5,7 @@ import { SortedLinkedList } from "../data/linkedList";
 import data, { compareFunc } from "../data/startingGraph";
 import { updateNodes, updateEdges } from "../utils/utils";
 
+
 const nodes: Nodes = inject("nodes")!
 const edges: Edges = inject("edges")!
 
@@ -18,7 +19,13 @@ const layouts: Layouts = inject("layouts")!
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
 
-const show = inject("show")!
+interface ShowType {
+  dijkstra: boolean;
+  spira: boolean;
+  zwick: boolean;
+}
+
+const show: ShowType = inject("show")!
 
 function addNode() {
   const nodeId = `node${nextNodeIndex.value}`
