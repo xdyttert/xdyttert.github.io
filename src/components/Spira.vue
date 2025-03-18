@@ -42,6 +42,8 @@ function resetSpira(){
     distanceKey="distanceSpira"
     QKey="isInQSpira"
     PKey="isInPSpira"
+    cKey="colorSpira"
+    prKey="prevSpira"
   />
 </template>  
 

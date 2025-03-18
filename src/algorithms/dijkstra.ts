@@ -1,22 +1,20 @@
 import PriorityQueue from "ts-priority-queue";
 import data from "../data/startingGraph"
 import { type Edge, type Edges, type Node, type Nodes, VNetworkGraph } from "v-network-graph";
-import { inject, ref } from "vue";
+import { inject, ref, type Ref } from "vue";
+
 const Q = new PriorityQueue({comparator: (node1: Node, node2: Node) => node1.distanceDijkstra - node2.distanceDijkstra})
 const lastNode: Node = ref({})
 const lastEdges = ref<Edge[]>([])
-
-// const nodes: Nodes = inject("nodes")!
-// const edges: Edges = inject("edges")!
 
 export function dijkstra(source: Node, nodes: Nodes, edges: Edges){
     // INITIALIZATION
     Q.clear()
     for (const key in nodes){
-        const vertex = nodes[key];
-        vertex.distanceDijkstra = Infinity;
-        vertex.prevDijkstra = null;
-        vertex.solvedDijkstra = false;
+        const u = nodes[key];
+        u.distanceDijkstra = Infinity;
+        u.prevDijkstra = null;
+        u.solvedDijkstra = false;
     };
     source.distanceDijkstra = 0;
     Q.queue(source)
@@ -25,13 +23,13 @@ export function dijkstra(source: Node, nodes: Nodes, edges: Edges){
         const u = Q.dequeue()!;
 
         for(const key in edges){
-            const succ = nodes[edges[key].target]
-            if (nodes[edges[key].source] == u && !succ.solvedDijkstra){
+            const v = nodes[edges[key].target]
+            if (nodes[edges[key].source] == u && !v.solvedDijkstra){
                 const newDistance = u.distanceDijkstra + edges[key].weight;
-                if (newDistance < succ.distanceDijkstra){
-                    succ.distanceDijkstra = newDistance;
-                    succ.prevDijkstra = u
-                    Q.queue(succ)
+                if (newDistance < v.distanceDijkstra){
+                    v.distanceDijkstra = newDistance;
+                    v.prevDijkstra = u
+                    Q.queue(v)
                 }
             }
         };
@@ -39,29 +37,41 @@ export function dijkstra(source: Node, nodes: Nodes, edges: Edges){
     }
 }
 
-export function oneStepDijkstra(step: number, source: Node, nodes: Nodes, edges: Edges){
-    console.log("bezi dijkstra")
-    console.log(source)
-    console.log(nodes)
-    console.log(step)
-    if(step == 0){
-        lastNode.value = {}
-        lastEdges.value = []
-        Q.clear()
-        for (const key in nodes){
-            const vertex = nodes[key];
-            vertex.distanceDijkstra = Infinity;
-            vertex.prevDijkstra = null;
-            vertex.solvedDijkstra = false;
-            vertex.colorDijkstra = "blue";
-        };
-        for (const key in edges){
-            edges[key].colorDijkstra = "blue"
-        }
+export function initialization(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+    lastNode.value = {}
+    lastEdges.value = []
+    Q.clear()
+    numOfRelaxededges.value = 0
+    for (const key in nodes){
+        const u = nodes[key];
+        u.distanceDijkstra = Infinity;
+        u.prevDijkstra = null;
+        u.solvedDijkstra = false;
+        u.colorDijkstra = "blue";
+    };
+    for (const key in edges){
+        edges[key].colorDijkstra = "blue"
+    }
+}
+
+function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
+    v.distanceDijkstra = u.distanceDijkstra + edge.weight;
+    v.prevDijkstra = u;
+    Q.queue(v);
+    v.colorDijkstra = "gray";
+    edge.colorDijkstra = "red";
+    lastEdges.value.push(edge);
+    numOfRelaxededges.value++
+}
+
+export function oneStepDijkstra(step: number, source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+    if (step == 0) { initialization(source, nodes, edges, numOfRelaxededges); return }
+
+    if (step == 1) {
         source.distanceDijkstra = 0;
         Q.queue(source)
         return
-    };
+    }
 
     lastNode.value.colorDijkstra = "green"
     for (const key in lastEdges.value){
@@ -69,25 +79,20 @@ export function oneStepDijkstra(step: number, source: Node, nodes: Nodes, edges:
         delete lastEdges.value[key]
     }
 
-    const u = Q.dequeue()!
-    u.colorDijkstra = "red"
-    lastNode.value = u
-
-    for(const key in edges){
-        const edge = edges[key]
-        const succ = nodes[edge.target]
-        if (nodes[edge.source] == u && !succ.solvedDijkstra){
+    if (Q.length > 0){
+        const u = Q.dequeue()
+        u.colorDijkstra = "red"
+        lastNode.value = u
+        for(const key in edges){
+            const edge = edges[key]
+            const v = nodes[edge.target]
             
-            const newDistance = u.distanceDijkstra + edge.weight;
-            if (newDistance < succ.distanceDijkstra){
-                succ.distanceDijkstra = newDistance;
-                succ.prevDijkstra = u;
-                Q.queue(succ);
-                succ.colorDijkstra = "gray";
-                edge.colorDijkstra = "red";
-                lastEdges.value.push(edge);
+            if (nodes[edge.source] == u && !v.solvedDijkstra){
+                if (u.distanceDijkstra + edge.weight < v.distanceDijkstra){
+                    relax(u, v, edge, numOfRelaxededges)
+                }
             }
-        }
-    };
-    u.solvedDijkstra = true;
+        };
+        u.solvedDijkstra = true;
+    }
 }

@@ -43,6 +43,8 @@ function resetDijkstra(){
     distanceKey="distanceDijkstra"
     QKey="isInQDijkstra"
     PKey="isInPDijkstra"
+    cKey="colorDijkstra"
+    prKey="prevDijkstra"
   />
 </template>
   

@@ -42,6 +42,8 @@ function resetZwick(){
     distanceKey="distanceZwick"
     QKey="isInQZwick"
     PKey="isInPZwick"
+    cKey="colorZwick"
+    prKey="prevZwick"
   />
 </template>
   

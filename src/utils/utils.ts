@@ -1,5 +1,5 @@
-import type { Edges, Nodes, Node } from "v-network-graph"
-import type { Ref } from "vue"
+import type { Edge, Edges, Nodes, Node } from "v-network-graph"
+import { ref, type Ref } from "vue"
 
 let startingNode: Node = {}
 
@@ -15,19 +15,37 @@ export function updateEdges(edges: Edges){
     }
 }
 
+export function getEdge(sourceId: string, targetId: String, edges: Edges){
+    for (const key in edges){
+        let edge = edges[key]
+        if (edge.source == sourceId && edge.target == targetId){
+            return edge
+        }
+    }
+    return { source: "node1", target: "node2", weight: 5, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false }
+}
+
+export function getNodeId(node: Node, nodes: Nodes){
+    for (const key in nodes){
+        if (nodes[key] == node){
+            return key
+        }
+    }
+    return ""
+}
+
 export function forwardStepAlgorithm(algorithm: Function, step: number, 
                                      startingNodeName: Ref<string>,
-                                     nodes: Nodes, edges: Edges){
+                                     nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>): [number, number]{
     console.log("pri algoritme", step)
-    if (step == 0){
+    if (step == 0 || step == 1){
         startingNode = findNodeByName(nodes, startingNodeName.value)
     }
-    algorithm(step, startingNode, nodes, edges);
+    algorithm(step, startingNode, nodes, edges, numOfRelaxededges);
     updateNodes(nodes);
     updateEdges(edges);
-    console.log("po algoritme", step)
-    console.log(step)
-    return step + 1;
+    console.log(numOfRelaxededges)
+    return [step + 1, numOfRelaxededges.value];
 }
 
 function findNodeByName(nodes: Nodes, name: string){
@@ -37,4 +55,14 @@ function findNodeByName(nodes: Nodes, name: string){
         }
     }
     return {}
+}
+
+export function shortestPathsTree(nodes: Nodes, edges: Edges, prev: keyof Node, color: keyof Edge){
+    for(const key in nodes){
+        let u = nodes[key]
+        let treeEdge = getEdge(getNodeId(u[prev], nodes), getNodeId(u, nodes), edges)
+        treeEdge[color] = "brown"
+    }
+    console.log(edges)
+    updateEdges(edges)
 }

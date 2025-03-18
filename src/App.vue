@@ -35,7 +35,6 @@ const show = reactive({
 })
 provide("show", show)
 
-
 </script>
 
 <template> 
@@ -107,5 +106,25 @@ export default defineComponent({
   opacity: 1;
   font-weight: bold;
   border: 0.5px solid #000000;
+}
+.toggles {
+  display: flex;
+  gap: 10px;
+  align-items: center; /* Align toggle buttons with labels */
+}
+.toggle {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #000000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000;
+  border-radius: 5px;
+  user-select: none;
 }
 </style>

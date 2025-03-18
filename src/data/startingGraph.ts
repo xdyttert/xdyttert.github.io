@@ -1,8 +1,12 @@
 import { type Nodes, type Edges, type Layouts, defineConfigs, type Edge, type Node } from "v-network-graph"
-import { reactive } from "vue"
+import { inject, reactive } from "vue"
 import { SortedLinkedList } from "./linkedList"
+import { showPertinent } from "@/utils/store"
 
 export const compareFunc = (a: Node, b: Node) => a.weight < b.weight
+
+
+
 
 const nodes: Nodes = {
   node1: { name: "N1", distanceDijkstra: 0, distanceSpira: 0, distanceZwick: 0, solvedDijkstra: false, solvedSpira: false, solvedZwick: false, prevDijkstra: null, prevSpira: null, prevZwick: null, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", isOut: true, activate: true, out: new SortedLinkedList<Node>(compareFunc), in: new SortedLinkedList<Node>(compareFunc), req: new SortedLinkedList<Node>(compareFunc) },
@@ -17,18 +21,18 @@ const nodes: Nodes = {
 }
 
 const edges: Edges = {
-  edge1: { source: "node1", target: "node2", weight: 5, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge2: { source: "node2", target: "node3", weight: 7, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge3: { source: "node2", target: "node4", weight: 2, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge4: { source: "node2", target: "node5", weight: 3, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge5: { source: "node5", target: "node6", weight: 2, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge6: { source: "node5", target: "node7", weight: 8, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge7: { source: "node3", target: "node7", weight: 2, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge8: { source: "node4", target: "node9", weight: 1, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge9: { source: "node7", target: "node9", weight: 3, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge10: { source: "node4", target: "node8", weight: 1, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge11: { source: "node8", target: "node9", weight: 5, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
-  edge12: { source: "node8", target: "node3", weight: 3, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false },
+  edge1: { source: "node1", target: "node2", weight: 5, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge2: { source: "node2", target: "node3", weight: 7, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge3: { source: "node2", target: "node4", weight: 2, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge4: { source: "node2", target: "node5", weight: 3, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge5: { source: "node5", target: "node6", weight: 2, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge6: { source: "node5", target: "node7", weight: 8, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge7: { source: "node3", target: "node7", weight: 2, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge8: { source: "node4", target: "node9", weight: 1, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge9: { source: "node7", target: "node9", weight: 3, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge10: { source: "node4", target: "node8", weight: 1, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge11: { source: "node8", target: "node9", weight: 5, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
+  edge12: { source: "node8", target: "node3", weight: 3, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false, inPertinent: false, outPertinent: false },
 } 
 
 const layouts: Layouts = {
@@ -48,6 +52,9 @@ const layouts: Layouts = {
 const configsDijkstra = reactive(defineConfigs<Node, Edge>({
   node: {
     selectable: 2, // up to 2 nodes
+    label: {
+      fontSize: 15
+    },
     normal: {
       color: node => node.colorDijkstra
     }
@@ -62,6 +69,9 @@ const configsDijkstra = reactive(defineConfigs<Node, Edge>({
       target: {
         type: "arrow"
       }
+    },
+    label: {
+      fontSize: 15
     }
   }
 }))
@@ -69,6 +79,9 @@ const configsDijkstra = reactive(defineConfigs<Node, Edge>({
 const configsSpira = reactive(defineConfigs <Node, Edge>({
   node: {
     selectable: 2, // up to 2 nodes
+    label: {
+      fontSize: 15
+    },
     normal: {
       color: node => node.colorSpira
     }
@@ -83,13 +96,19 @@ const configsSpira = reactive(defineConfigs <Node, Edge>({
       target: {
         type: "arrow"
       }
-    }
+    },
+    label: {
+      fontSize: 15
+    },
   },
 }))
 
 const configsZwick = reactive(defineConfigs<Node, Edge>({
   node: {
     selectable: 2, // up to 2 nodes
+    label: {
+      fontSize: 15
+    },
     normal: {
       color: node => node.colorZwick
     }
@@ -98,13 +117,17 @@ const configsZwick = reactive(defineConfigs<Node, Edge>({
     selectable: true,
     normal: {
       width: 3,
-      color: edge => edge.colorZwick
+      color: edge => edge.colorZwick,
+      dasharray: edge => (edge.outPertinent && showPertinent.out ? "6" : (edge.inPertinent && showPertinent.in ? "2" : "0"))
     },
     marker: {
       target: {
         type: "arrow"
       }
-    }
+    },
+    label: {
+      fontSize: 15
+    },
   },
 }))
 
