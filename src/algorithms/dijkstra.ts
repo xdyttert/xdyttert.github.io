@@ -2,6 +2,7 @@ import PriorityQueue from "ts-priority-queue";
 import data from "../data/startingGraph"
 import { type Edge, type Edges, type Node, type Nodes, VNetworkGraph } from "v-network-graph";
 import { inject, ref, type Ref } from "vue";
+import { tr } from "element-plus/es/locales.mjs";
 
 const Q = new PriorityQueue({comparator: (node1: Node, node2: Node) => node1.distanceDijkstra - node2.distanceDijkstra})
 const lastNode: Node = ref({})
@@ -37,7 +38,7 @@ export function dijkstra(source: Node, nodes: Nodes, edges: Edges){
     }
 }
 
-export function initialization(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+export function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
     lastNode.value = {}
     lastEdges.value = []
     Q.clear()
@@ -48,6 +49,7 @@ export function initialization(source: Node, nodes: Nodes, edges: Edges, numOfRe
         u.prevDijkstra = null;
         u.solvedDijkstra = false;
         u.colorDijkstra = "blue";
+        u.isInQDijkstra = false
     };
     for (const key in edges){
         edges[key].colorDijkstra = "blue"
@@ -57,7 +59,7 @@ export function initialization(source: Node, nodes: Nodes, edges: Edges, numOfRe
 function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
     v.distanceDijkstra = u.distanceDijkstra + edge.weight;
     v.prevDijkstra = u;
-    Q.queue(v);
+    if (!v.isInQDijkstra) { Q.queue(v); v.isInQDijkstra = true }
     v.colorDijkstra = "gray";
     edge.colorDijkstra = "red";
     lastEdges.value.push(edge);
@@ -65,11 +67,12 @@ function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
 }
 
 export function oneStepDijkstra(step: number, source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
-    if (step == 0) { initialization(source, nodes, edges, numOfRelaxededges); return }
+    if (step == 0) { initialization(nodes, edges, numOfRelaxededges); return }
 
     if (step == 1) {
         source.distanceDijkstra = 0;
         Q.queue(source)
+        source.isInQDijkstra = true
         return
     }
 
@@ -80,14 +83,18 @@ export function oneStepDijkstra(step: number, source: Node, nodes: Nodes, edges:
     }
 
     if (Q.length > 0){
+        console.log(Q)
         const u = Q.dequeue()
+        u.isInQDijkstra = false
         u.colorDijkstra = "red"
         lastNode.value = u
         for(const key in edges){
             const edge = edges[key]
             const v = nodes[edge.target]
             
-            if (nodes[edge.source] == u && !v.solvedDijkstra){
+            if (nodes[edge.source] == u){
+                lastEdges.value.push(edge)
+                edge.colorDijkstra = "orange"
                 if (u.distanceDijkstra + edge.weight < v.distanceDijkstra){
                     relax(u, v, edge, numOfRelaxededges)
                 }

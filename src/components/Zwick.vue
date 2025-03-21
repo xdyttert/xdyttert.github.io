@@ -16,7 +16,6 @@ const selectedNodes: Ref<string[], string[]> = inject("selectedNodesProv")!
 const selectedEdges: Ref<string[], string[]> = inject("selectedEdgesProv")!
 
 const zwickStep = ref(0)
-let zwickInnerCycle = true
 
 const layouts: Layouts = inject("layouts")!
 

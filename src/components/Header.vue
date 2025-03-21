@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { type Edges, type Layouts, type Node, type Nodes } from "v-network-graph";
+import { type Edge, type Edges, type Layouts, type Node, type Nodes, type VNetworkGraph, type VNetworkGraphInstance} from "v-network-graph";
+import * as vNG from "v-network-graph";
 import { inject, provide, ref, type Ref } from "vue";
 import { SortedLinkedList } from "../data/linkedList";
 import data, { compareFunc } from "../data/startingGraph";
-import { updateNodes, updateEdges } from "../utils/utils";
+import { updateNodes, updateEdges, getEdge } from "../utils/utils";
+
 
 
 const nodes: Nodes = inject("nodes")!
 const edges: Edges = inject("edges")!
+
 
 const nextNodeIndex = ref(Object.keys(nodes).length + 1)
 const nextEdgeIndex = ref(Object.keys(edges).length + 1)
@@ -33,7 +36,7 @@ function addNode() {
   nodes[nodeId] = { name, distanceDijkstra: 0, distanceSpira: 0, distanceZwick: 0, 
                          solved: false, prev: null, 
                          colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", 
-                         out: new SortedLinkedList<Node>(compareFunc), in: new SortedLinkedList<Node>(compareFunc) }
+                         out: new SortedLinkedList<Edge>(compareFunc), in: new SortedLinkedList<Edge>(compareFunc) }
   layouts.nodes[nodeId] = {x: 360, y: -50}
   nextNodeIndex.value++
   console.log(data.layouts)
@@ -66,15 +69,19 @@ function removeNode() {
 }
 
 function addEdge() {
-  if (selectedNodes.value.length !== 2) return
+  if (selectedNodes.value.length !== 2) { return }
   const [source, target] = selectedNodes.value
+  let s = nodes[source]
+  let t = nodes[target]
+  let existingEdge = getEdge(source, target, edges)
+
+  if (existingEdge.source != "null") { alert('Edge from node "' + s.name + '" to node "' + t.name + '" already exists.'); return }
   const edgeId = `edge${nextEdgeIndex.value}`
   const edge = { source, target, weight: 0, queueKey: 0, 
                  colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue" }
-  // data.edges[edgeId] = edge
   edges[edgeId] = edge
-  nodes[source].out.insertNode(edge)
-  nodes[target].in.insertNode(edge)
+  s.out.insertNode(edge)
+  t.in.insertNode(edge)
   nextEdgeIndex.value++
 }
 
@@ -85,24 +92,24 @@ function removeEdge() {
     let target = nodes[edge.target]
     source.out.deleteNode(edge)
     target.in.deleteNode(edge)
-    // delete data.edges[edgeId]
     delete edges[edgeId]
   }
   selectedEdges.value = []
 }
 
-
 function updateEdgeWeight(){
+  let newWeightString = (document.getElementById("weightInput")! as HTMLInputElement).value
+  let newWeight = Number(newWeightString)
+  if (Number.isNaN(newWeight) || newWeight < 0) { alert('Wrong edge weight "' + newWeightString + '". Please input nonnegative number.'); return } //TODO error 
   for(const edgeId of selectedEdges.value){
     nodes[edges[edgeId].source].out.deleteNode(edges[edgeId])
     nodes[edges[edgeId].target].in.deleteNode(edges[edgeId])
-    edges[edgeId].weight = +(document.getElementById("weightInput")! as HTMLInputElement).value;
+    edges[edgeId].weight = newWeight
     nodes[edges[edgeId].source].out.insertNode(edges[edgeId])
     nodes[edges[edgeId].target].in.insertNode(edges[edgeId])
   }
   updateEdges(edges);
 }
-
 
 </script>
 
@@ -114,6 +121,7 @@ function updateEdgeWeight(){
         <el-button class="equal-btn" @click="addNode">add node</el-button>
         <el-button class="equal-btn" :disabled="selectedNodes.length == 0" @click="removeNode">remove node</el-button>
       </div>
+
       <div class="edges">
         <el-button :disabled="selectedNodes.length != 2" @click="addEdge">add edge</el-button>
         <el-button :disabled="selectedEdges.length == 0" @click="removeEdge">remove edge</el-button>
@@ -148,8 +156,6 @@ function updateEdgeWeight(){
       <label class="label label-colored"> Wilson-Zwick section: </label>
       <div class="toggle" :class="{ active: show.zwick }" @click="show.zwick = !show.zwick"> {{ show.zwick ? "✔" : "✖" }} </div>
     </div>
-    <!-- <label>{{ selectedEdges }}</label>
-    <label>{{ selectedNodes }}</label> -->
   </div>
 </template>
 
@@ -165,10 +171,10 @@ export default defineComponent({
 <style scoped>
 .header {
   display: flex;
-  justify-content: space-between; /* Ensure even spacing */
-  align-items: center; /* Align items vertically */
-  gap: 20px; /* Space between sections */
-  flex-wrap: wrap; /* Prevents breaking on small screens */
+  justify-content: space-between; 
+  align-items: center; 
+  gap: 20px; 
+  flex-wrap: wrap; 
   background-color: #F2D45C;
   padding: 5px;
   font-size: 20px;
@@ -176,7 +182,7 @@ export default defineComponent({
 }
 .graph-manipulation {
   display: flex;
-  gap: 20px; /* Space between buttons */
+  gap: 20px; 
 }
 .nodes {
   display: flex;

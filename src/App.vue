@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Layouts } from "v-network-graph";
+import type { Layouts, VNetworkGraphInstance } from "v-network-graph";
 import { defineComponent, provide, reactive, ref, type Ref } from "vue";
 import Dijkstra from "./components/Dijkstra.vue";
 import Header from "./components/Header.vue";
@@ -16,9 +16,11 @@ provide("selectedEdgesProv", selectedEdges)
 
 const nodes = reactive({ ...data.nodes })
 const edges = reactive({ ...data.edges })
+const graph = ref<VNetworkGraphInstance | null>(null);
 
 provide("nodes", nodes)
 provide("edges", edges)
+provide("graph", graph)
 
 const layouts = reactive({ ...data.layouts })
 

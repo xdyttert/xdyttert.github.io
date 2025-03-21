@@ -1,44 +1,60 @@
 <script setup lang="ts">
-import { type Nodes, type Edges, type Edge, type Node } from "v-network-graph";
-import { defineProps, defineEmits, type Ref, ref, provide, inject } from "vue";
+import { type Nodes, type Edges, type Edge, type Node, type VNetworkGraphInstance } from "v-network-graph";
+import { defineProps, defineEmits, type Ref, ref, provide, inject, onMounted, nextTick } from "vue";
 import { forwardStepAlgorithm, shortestPathsTree } from "../utils/utils";
 import { showPertinent } from "@/utils/store";
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
-  
-  const props = defineProps<{
-    label: String,
-    algorithm: Function,
-    nodes: Nodes,
-    edges: Edges,
-    layouts: Object,
-    configs: Object,
-    selectedNodes: Array<string>,
-    selectedEdges: Array<string>,
-    distanceKey: String,
-    cKey: String,
-    QKey: String,
-    PKey: String,
-    prKey: String,
-  }>();
 
-  const distanceKeyt = props.distanceKey as keyof Node
-  const QKeyt = props.QKey as keyof Edge
-  const PKeyt = props.PKey as keyof Edge
-  let step = 0
-  let numOfrelaxedEdges = ref(0)
-  const colorKey = props.cKey as keyof Edge
-  const prevKey = props.prKey as keyof Node
   
-  const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
+const props = defineProps<{
+  label: String,
+  algorithm: Function,
+  nodes: Nodes,
+  edges: Edges,
+  layouts: Object,
+  configs: Object,
+  selectedNodes: Array<string>,
+  selectedEdges: Array<string>,
+  distanceKey: String,
+  cKey: String,
+  QKey: String,
+  PKey: String,
+  prKey: String,
+}>();
+
+const distanceKeyt = props.distanceKey as keyof Node
+const QKeyt = props.QKey as keyof Edge
+const PKeyt = props.PKey as keyof Edge
+let step = 0
+let numOfrelaxedEdges = ref(0)
+const colorKey = props.cKey as keyof Edge
+const prevKey = props.prKey as keyof Node
   
-  const updateSelectedNodes = (newValue: Ref<string[], string[]>) => {
-    emit("update:selectedNodes", newValue);
-  };
+const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
   
-  const updateSelectedEdges = (newValue: Ref<string[], string[]>) => {
-    emit("update:selectedEdges", newValue);
-  };
+const updateSelectedNodes = (newValue: Ref<string[], string[]>) => {
+  emit("update:selectedNodes", newValue);
+};
+  
+const updateSelectedEdges = (newValue: Ref<string[], string[]>) => {
+  emit("update:selectedEdges", newValue);
+};
+
+const graph = ref<VNetworkGraphInstance | null>(null);
+
+const fitGraphToContainer = () => {
+  if (graph.value) {
+    graph.value.fitToContents({
+      margin: {
+        top: 10,
+        left: 10,
+        right: 10,
+        bottom: 130,
+      },
+    });
+  }
+};
 
   function resetS(algorithm: Function, nodes: Nodes, edges: Edges){
       step = 0
@@ -51,9 +67,9 @@ function runAlg(algorithm: Function, nodes: Nodes, edges: Edges){
       const result = forwardStepAlgorithm(algorithm, step, ref(startingNodeName), nodes, edges, ref(numOfrelaxedEdges))
       step = result[0]
       numOfrelaxedEdges.value = result[1]
-      console.log(numOfrelaxedEdges)
   }
-  </script>
+  
+</script>
   
   <template>
     <div>
@@ -62,13 +78,15 @@ function runAlg(algorithm: Function, nodes: Nodes, edges: Edges){
           <label class="label label-colored"> {{ label }}: </label>
           <el-button @click="runAlg(algorithm, nodes, edges)">></el-button>
           <el-button @click="resetS(algorithm, nodes, edges)">reset</el-button>
-          <el-button @click="shortestPathsTree(nodes, edges, prevKey, colorKey)">show SPT</el-button>
+          <el-button @click="shortestPathsTree(nodes, edges, prevKey, colorKey)">SPT</el-button>
 
-          <div v-if="label == 'Wilson-Zwick'" class="toggles">
-            <label class="label label-colored">out-pertinent: </label>
+          <el-button @click="fitGraphToContainer">fit</el-button>
+
+          <div v-if="label == 'Wilson-Zwick'" class="toggles-h">
+            <label class="label label-colored">out:</label>
             <div class="toggle" :class="{ active: showPertinent.out }" @click="showPertinent.out = !showPertinent.out"> {{ showPertinent.out ? "✔" : "✖" }} </div>
 
-            <label class="label label-colored">in-pertinent: </label>
+            <label class="label label-colored">in:</label>
             <div class="toggle" :class="{ active: showPertinent.in }" @click="showPertinent.in = !showPertinent.in"> {{ showPertinent.in ? "✔" : "✖" }} </div>
           </div>
         </div>
@@ -129,14 +147,21 @@ function runAlg(algorithm: Function, nodes: Nodes, edges: Edges){
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex: 1;
+  height: 70px;
 }
 .relaxed-edges {
-  display: flex;  /* Ensure the relaxed-edges div stays inline */
-  justify-content: flex-end; /* Align content to the right */
-  align-items: center; /* Vertically center the content */
+  display: flex;  
+  justify-content: flex-end; 
+  align-items: center; 
   gap: 0px;
 }
 .bold-label {
   font-weight: bold;
+}
+.toggles-h {
+  display: flex;
+  gap: 0px;
+  align-items: center; 
 }
 </style>

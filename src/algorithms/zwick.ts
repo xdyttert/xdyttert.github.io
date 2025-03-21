@@ -5,6 +5,7 @@ import type { Edge, Edges, Node, Nodes } from "v-network-graph"
 import { ref, type Ref } from "vue"
 import { fa } from "element-plus/es/locales.mjs"
 import { getEdge, getNodeId } from "@/utils/utils"
+import { bfs } from "./bfs"
 
 let innerCycle: boolean = false
 
@@ -80,7 +81,7 @@ export function zwick(source: Node, nodes: Nodes, edges: Edges){
         vertex.solvedZwick = false
         vertex.isOut = true
         vertex.activate = false
-        vertex.req = new SortedLinkedList<Node>(compareFunc)
+        vertex.req = new SortedLinkedList<Edge>(compareFunc)
         vertexNum++
     }
 
@@ -127,7 +128,7 @@ export function zwick(source: Node, nodes: Nodes, edges: Edges){
     }
 }
 
-function initialization(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
     innerCycle = false
     lastEdgesGreen.value = []
     lastEdgesBlue.value = []
@@ -146,7 +147,7 @@ function initialization(source: Node, nodes: Nodes, edges: Edges, numOfRelaxeded
         vertex.prevZwick = null
         vertex.out.reset()
         vertex.in.reset()
-        vertex.req = new SortedLinkedList<Node>(compareFunc)
+        vertex.req = new SortedLinkedList<Edge>(compareFunc)
         vertex.colorZwick = "blue"
         vertex.solvedZwick = false
         vertex.isOut = true
@@ -173,11 +174,12 @@ function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
 }
 
 export function oneStepZwick(step: number, source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
-    if (step == 0){ initialization(source, nodes, edges, numOfRelaxededges); return }
+    if (step == 0){ initialization(nodes, edges, numOfRelaxededges); return }
 
     if (step == 1) {
         source.distanceZwick = 0
         source.solvedZwick = true
+        vertexNum = bfs(source, nodes, edges)
         forward(source)
         return
     }
@@ -189,6 +191,7 @@ export function oneStepZwick(step: number, source: Node, nodes: Nodes, edges: Ed
         lastEdgesGreen.value[key].colorZwick = "green";
         delete lastEdgesGreen.value[key]
     }
+
     if (!innerCycle){
         if (solvedNum != vertexNum && P.length > 0){
             let edge = P.dequeue()
@@ -226,9 +229,7 @@ export function oneStepZwick(step: number, source: Node, nodes: Nodes, edges: Ed
         edge.isInQZwick = false
         lastEdgesBlue.value.push(edge)
         let u = nodes[edge.source]
-        //vertex.colorZwick = "green"
         let v = nodes[edge.target]
-        //v.colorZwick = "magenta"
         if (v.solvedZwick){
             lastNodeGreen.value = v
             lastEdgesGreen.value.push(edge)

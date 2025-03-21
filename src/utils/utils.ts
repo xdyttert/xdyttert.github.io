@@ -22,7 +22,7 @@ export function getEdge(sourceId: string, targetId: String, edges: Edges){
             return edge
         }
     }
-    return { source: "node1", target: "node2", weight: 5, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false }
+    return { source: "null", target: "null", weight: 5, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false }
 }
 
 export function getNodeId(node: Node, nodes: Nodes){
@@ -37,14 +37,12 @@ export function getNodeId(node: Node, nodes: Nodes){
 export function forwardStepAlgorithm(algorithm: Function, step: number, 
                                      startingNodeName: Ref<string>,
                                      nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>): [number, number]{
-    console.log("pri algoritme", step)
     if (step == 0 || step == 1){
         startingNode = findNodeByName(nodes, startingNodeName.value)
     }
     algorithm(step, startingNode, nodes, edges, numOfRelaxededges);
     updateNodes(nodes);
     updateEdges(edges);
-    console.log(numOfRelaxededges)
     return [step + 1, numOfRelaxededges.value];
 }
 

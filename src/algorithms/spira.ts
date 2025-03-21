@@ -2,6 +2,7 @@ import data from "@/data/startingGraph";
 import PriorityQueue from "ts-priority-queue";
 import { type Edge, type Edges, type Node, type Nodes } from "v-network-graph";
 import { inject, ref, type Ref } from "vue";
+import { bfs } from "./bfs";
 
 const P = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.queueKey - edge2.queueKey})
 let solvedNum = 0
@@ -53,7 +54,7 @@ export function spira(source: Node, nodes: Nodes, edges: Edges){
     }
 }
 
-function initialization(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
     P.clear()
     lastEdge.value = {}
     lastNode.value = {}
@@ -67,11 +68,11 @@ function initialization(source: Node, nodes: Nodes, edges: Edges, numOfRelaxeded
         vertex.out.reset()
         vertex.colorSpira = "blue"
         vertex.solvedSpira = false
-        vertexNum++
     }
     for (const key in edges){
         edges[key].colorSpira = "blue"
     }
+    console.log(vertexNum)
 }
 
 function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
@@ -81,27 +82,33 @@ function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
     v.solvedSpira = true
     forward(v)
     numOfRelaxededges.value++
+    edge.colorSpira = "red"
+    v.colorSpira = "red"
 }
 
 export function oneStepSpira(step: number, source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
-    if (step == 0){ initialization(source, nodes, edges, numOfRelaxededges); return }
+    if (step == 0){ initialization(nodes, edges, numOfRelaxededges); return }
 
     if (step == 1){
+        vertexNum = bfs(source, nodes, edges)
         source.distanceSpira = 0
+        source.solvedSpira = true
+        solvedNum++
         forward(source)
         return
     }
-
     lastEdge.value.colorSpira = "green";
     lastNode.value.colorSpira = "green";
+
     if(solvedNum != vertexNum && P.length > 0){
+        
         const edge = P.dequeue()
-        edge.colorSpira = "red"
+        edge.colorSpira = "orange"
         lastEdge.value = edge
         const u = nodes[edge.source]
         u.colorSpira = "green"
         const v = nodes[edge.target]
-        v.colorSpira = "red"
+        //v.colorSpira = "red"
         lastNode.value = v
         forward(u)
         if (!v.solvedSpira){
