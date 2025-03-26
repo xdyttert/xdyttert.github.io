@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type Nodes, type Edges, type Edge, type Node, type VNetworkGraphInstance, type Layouts } from "v-network-graph";
 import { defineProps, defineEmits, type Ref, ref, provide, inject, onMounted, nextTick } from "vue";
-import { findNodeByName, forwardStepAlgorithm, shortestPathsTree, wait } from "../utils/utils";
+import { findNodeByName, forwardStepAlgorithm, shortestPathsTree, updateEdges, updateNodes, wait } from "../utils/utils";
 import { showPertinent, animate, type Animate } from "@/utils/store";
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
@@ -86,7 +86,10 @@ async function animateAlgorithm(){
   while(animate[animateKey]){
     await wait(700)
     if (iteratorAlg == null) { iteratorAlg = props.iterator(findNodeByName(props.nodes, startingNodeName.value), props.nodes, props.edges, ref(props.numOfRelaxedEdges)) }
+    console.log("v cykle")
     if (iteratorAlg.next().done){ animate[animateKey] = false }
+    updateEdges(props.edges)
+    updateNodes(props.nodes)
   }
 }
 </script>
