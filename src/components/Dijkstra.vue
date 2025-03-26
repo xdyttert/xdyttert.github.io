@@ -1,31 +1,13 @@
 <script setup lang="ts">
-import type { Edges, Layouts, Nodes } from "v-network-graph";
-import * as vNG from "v-network-graph";
-import { inject, ref, type Ref } from "vue";
-import { dijkstra, oneStepDijkstra, Dijkstra, initialization } from "../algorithms/dijkstra";
-import data from "../data/startingGraph";
-import GraphAlgorithm from "./GraphAlgorithm.vue";
-import { updateNodes, updateEdges } from "../utils/utils";
-
-const nodes: Nodes = inject("nodes")!
-const edges: Edges = inject("edges")!
-
-const graph = ref<vNG.Instance>()
+import { inject, type Ref, ref } from "vue";
+import data from "../data/startingGraph"
+import { Dijkstra, initialization } from "../algorithms/dijkstra";
 
 const selectedNodes: Ref<string[], string[]> = inject("selectedNodesProv")!
 const selectedEdges: Ref<string[], string[]> = inject("selectedEdgesProv")!
 
 let relaxedEdgesDijkstra = 0
 
-const dijkstraStep = ref(0)
-
-const layouts: Layouts = inject("layouts")!
-
-function resetDijkstra(){
-  dijkstraStep.value = 0
-  console.log("restDijkstra")
-  console.log(dijkstraStep.value)
-}
 </script>
 
 <template>
@@ -34,14 +16,7 @@ function resetDijkstra(){
     :initialization="initialization"
     :iterator="Dijkstra"
     :numOfRelaxedEdges="ref(relaxedEdgesDijkstra)"
-    :step="ref(dijkstraStep)"
-    :reset="resetDijkstra"
-    :nodes="nodes"
-    :edges="edges"
-    :layouts="layouts"
     :configs="data.configsDijkstra"
-    :selected-nodes="selectedNodes"
-    :selected-edges="selectedEdges"
     @update:selected-nodes="selectedNodes = $event"
     @update:selected-edges="selectedEdges = $event"
     distanceKey="distanceDijkstra"

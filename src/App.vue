@@ -64,7 +64,6 @@ export default defineComponent({
 </script>
 
 <style>
-/* Global Grid Layout for Three Columns */
 .container {
   display: flex;
   width: 100%;
@@ -77,28 +76,27 @@ export default defineComponent({
     position: relative;
   }
 }
-/* Optional: Styling for each section */
 .section {
   flex: 1;
   border: 1px solid #000000;
   min-width: 0;
 }
 .row {
-  display: flex; /* Use flexbox for row alignment */
-  align-items: center; /* Vertically center label and button */
-  gap: 10px; /* Space between label and button */
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .label {
-  min-width: 55px; /* Set consistent label width */
-  text-align: center; /* Right-align label text */
+  min-width: 55px;
+  text-align: center;
   color: #000000;
 }
 .graph {
-  flex: 1; /* Allow the graph to expand and fill available space */
+  flex: 1;
   display: flex;
   float: center;
-  justify-content: center; /* Center the graph horizontally */
-  align-items: center; /* Center the graph vertically */
+  justify-content: center;
+  align-items: center;
   background-color: #ffffff;
   padding: 0rem;
   border-radius: 1px;
@@ -119,7 +117,7 @@ export default defineComponent({
 .toggles {
   display: flex;
   gap: 10px;
-  align-items: center; /* Align toggle buttons with labels */
+  align-items: center;
 }
 .toggle {
   width: 20px;

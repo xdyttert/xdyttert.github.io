@@ -2,9 +2,17 @@
 import { type Nodes, type Edges, type Edge, type Node, type VNetworkGraphInstance, type Layouts } from "v-network-graph";
 import { defineProps, defineEmits, type Ref, ref, provide, inject, onMounted, nextTick } from "vue";
 import { findNodeByName, forwardStepAlgorithm, shortestPathsTree, updateEdges, updateNodes, wait } from "../utils/utils";
-import { showPertinent, animate, type Animate } from "@/utils/store";
+import { showPertinent, animate, type Animate } from "../utils/store";
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
+
+const nodes: Nodes = inject("nodes")!
+const edges: Edges = inject("edges")!
+
+const selectedNodes: Ref<string[], string[]> = inject("selectedNodesProv")!
+const selectedEdges: Ref<string[], string[]> = inject("selectedEdgesProv")!
+
+let M = inject("M")!
   
 const props = defineProps<{
   label: String,
@@ -20,12 +28,7 @@ const props = defineProps<{
     numOfRelaxededges: Ref<number>
   ) => Generator<any, void, unknown>,
   numOfRelaxedEdges: Ref<number>
-  nodes: Nodes,
-  edges: Edges,
-  layouts: Layouts,
   configs: Object,
-  selectedNodes: Array<string>,
-  selectedEdges: Array<string>,
   distanceKey: String,
   cKey: String,
   QKey: String,
@@ -38,7 +41,8 @@ const QKeyt = props.QKey as keyof Edge
 const PKeyt = props.PKey as keyof Edge
 const colorKey = props.cKey as keyof Edge
 const prevKey = props.prKey as keyof Node
-const animateKey = (props.label == "Wilson-Zwick" ? "zwick" : props.label.toLowerCase()) as keyof Animate 
+const animateKey = (props.label == "Wilson-Zwick" ? "zwick" : props.label.toLowerCase()) as keyof Animate
+const layouts: Layouts = inject("layouts")!
 const layers = {
   badge: "nodes",
 }
@@ -58,7 +62,7 @@ const fitGraphToContainer = () => {
 };
 
 let iteratorAlg: Generator<any, void, unknown> | null = null
-props.initialization(props.nodes, props.edges, ref(props.numOfRelaxedEdges))
+props.initialization(nodes, edges, ref(props.numOfRelaxedEdges))
 
 const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
   
@@ -71,13 +75,13 @@ const updateSelectedEdges = (newValue: Ref<string[], string[]>) => {
 };
 
 function reset(){
-  props.initialization(props.nodes, props.edges, ref(props.numOfRelaxedEdges))
+  props.initialization(nodes, edges, ref(props.numOfRelaxedEdges))
   iteratorAlg = null
   }
 
 function runAlgorithm(){
   if (iteratorAlg == null){
-      iteratorAlg = props.iterator(findNodeByName(props.nodes, startingNodeName.value), props.nodes, props.edges, ref(props.numOfRelaxedEdges))
+      iteratorAlg = props.iterator(findNodeByName(nodes, startingNodeName.value), nodes, edges, ref(props.numOfRelaxedEdges))
   }
   iteratorAlg.next()
 }
@@ -85,7 +89,7 @@ function runAlgorithm(){
 async function animateAlgorithm(){
   while(animate[animateKey]){
     await wait(700)
-    if (iteratorAlg == null) { iteratorAlg = props.iterator(findNodeByName(props.nodes, startingNodeName.value), props.nodes, props.edges, ref(props.numOfRelaxedEdges)) }
+    if (iteratorAlg == null) { iteratorAlg = props.iterator(findNodeByName(nodes, startingNodeName.value), nodes, edges, ref(props.numOfRelaxedEdges)) }
     console.log("v cykle")
     if (iteratorAlg.next().done){ animate[animateKey] = false }
   }
@@ -113,8 +117,15 @@ async function animateAlgorithm(){
           </div>
         </div>
         <div class="relaxed-edges">
-          <label class="label label-colored"> {{ numOfRelaxedEdges }} </label>
-          <label class="label label-colored"> relaxed edges</label>
+          <div>
+            <label class="label label-colored"> {{ numOfRelaxedEdges }} </label>
+            <label class="label label-colored"> relaxed edges</label>
+          </div>
+          
+          <div>
+            <label class="label label-colored">M: </label>
+            <label class="label label-colored">{{ M }}</label>
+          </div>
         </div>
       </div>
   
@@ -190,6 +201,7 @@ async function animateAlgorithm(){
   justify-content: flex-end; 
   align-items: center; 
   gap: 0px;
+  flex-direction: column;
 }
 .bold-label {
   font-weight: bold;

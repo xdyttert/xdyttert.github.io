@@ -9,7 +9,6 @@ import { updateNodes, updateEdges, getEdge } from "../utils/utils";
 const nodes: Nodes = inject("nodes")!
 const edges: Edges = inject("edges")!
 
-
 const nextNodeIndex = ref(Object.keys(nodes).length + 1)
 const nextEdgeIndex = ref(Object.keys(edges).length + 1)
 
@@ -115,7 +114,7 @@ function removeEdge() {
     source.outSpira.deleteNode(edge)
     source.outDijkstra = source.outDijkstra.filter((e: Edge) => e != edge)
     target.in.deleteNode(edge)
-    
+
     delete edges[edgeId]
   }
   selectedEdges.value = []
