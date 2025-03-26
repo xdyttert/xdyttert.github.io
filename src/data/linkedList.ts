@@ -1,5 +1,6 @@
 import { ref, type UnwrapRef } from "vue"
 import data from "./startingGraph"
+import { th } from "element-plus/es/locales.mjs"
 
 
 class ListNode<T>{
@@ -30,6 +31,7 @@ export class SortedLinkedList<T>{
         const node: ListNode<T> = new ListNode<T>(data)
         if (this.head == null){
             this.head = node
+            this.currPoint = this.head
             return
         }
         if (this.compareFunction(node.data, this.head.data)){
@@ -44,6 +46,28 @@ export class SortedLinkedList<T>{
         }
         node.next = currNode.next
         currNode.next = node
+    }
+
+    public insertNodeReq(data: T){
+        const node: ListNode<T> = new ListNode<T>(data)
+        if (this.head == null){
+            this.head = node
+            this.currPoint = this.head
+            return
+        }
+        if (this.compareFunction(node.data, this.head.data)){
+            
+            node.next = this.head
+            this.head = node
+            return
+    }
+        let currNode = this.head
+        while (currNode.next != null && !this.compareFunction(node.data, currNode.next.data)){
+            currNode = currNode.next
+        }
+        node.next = currNode.next
+        currNode.next = node
+        if (this.currPoint == null) { this.currPoint = node }
     }
 
     public deleteNode(data: T){
@@ -69,6 +93,17 @@ export class SortedLinkedList<T>{
         let ret = this.currPoint
         this.currPoint = this.currPoint.next
         return ret.data
+    }
+
+    public nextReq(): T | null{
+        if (this.currPoint == null){
+            return null
+        }
+        if (this.currPoint == this.head){
+            return this.head.data
+        }
+        this.currPoint == this.currPoint.next
+        return (this.currPoint == null ? null : this.currPoint.data)
     }
 
     public reset(){

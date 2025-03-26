@@ -3,14 +3,14 @@ import { SortedLinkedList } from "@/data/linkedList"
 import PriorityQueue from "ts-priority-queue"
 import type { Edge, Edges, Node, Nodes } from "v-network-graph"
 import { ref, type Ref } from "vue"
-import { fa } from "element-plus/es/locales.mjs"
+import { fa, tr } from "element-plus/es/locales.mjs"
 import { getEdge, getNodeId } from "@/utils/utils"
 import { bfs } from "./bfs"
 
 let innerCycle: boolean = false
 
-const P = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.queueKey - edge2.queueKey})
-const Q = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.queueKey - edge2.queueKey})
+const P = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.PKeyZwick - edge2.PKeyZwick})
+const Q = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.weight - edge2.weight})
 let solvedNum = 0
 let vertexNum = 0
 let M: number = Infinity
@@ -19,49 +19,53 @@ const lastNodeBlue: Node = ref({})
 const lastEdgesGreen = ref<Edge[]>([])
 const lastEdgesBlue = ref<Edge[]>([])
 
-function forward(vertex: Node){
+function min(P: PriorityQueue<Edge>){
+    if (P.length == 0){ return Infinity }
+    return P.peek().PKeyZwick
+}
+
+function forward(u: Node){
     let edge = null
-    if (vertex.isOut){
-        edge = vertex.out.next()
+    if (u.isOut){
+        edge = u.outZwick.next()
         
-        if (edge == null || edge.weight > 2*(M - vertex.distanceZwick)){
-            vertex.isOut = false
+        if (edge == null || edge.weight > 2*(M - u.distanceZwick)){
+            u.isOut = false
         }
-        else {edge.outPertinent = true}
+        
+        else { edge.outPertinent = true }
     }
-    if (!vertex.isOut){
-        edge = vertex.req.next()
+    if (!u.isOut){
+        edge = u.req.next()
     }
 
-    vertex.activate = (edge != null)
-    if (vertex.activate){
-        edge.queueKey = edge.weight + vertex.distanceZwick
+    u.active = (edge != null)
+    if (u.active){
+        edge.PKeyZwick = edge.weight + u.distanceZwick
         edge.colorZwick = "gray"
         P.queue(edge)
         edge.isInPZwick = true
     }
 }
 
-function backward(vertex: Node){
-    let edge = vertex.in.next()
+function backward(u: Node){
+    let edge = u.in.next()
 
     if (edge != null){
-        edge.queueKey = edge.weight
-        edge.colorZwick = "orange"
+        edge.QKeyZwick = edge.weight
+        // edge.colorZwick = "black"
         Q.queue(edge)
         edge.isInQZwick = true
     }
 }
 
-function request(vertex: Node, successor: Node, nodes: Nodes, edges: Edges){
-    let edge = getEdge(getNodeId(vertex, nodes), getNodeId(successor, nodes), edges)
-    vertex.req.insertNode(edge)
-    if (vertex.req.isLength1()){
-        vertex.req.reset()
-    }
-
-    if (vertex.solvedZwick && !vertex.activate){
-        forward(vertex)
+function request(u: Node, v: Node, nodes: Nodes, edges: Edges){
+    let edge = getEdge(getNodeId(u, nodes), getNodeId(v, nodes), edges)
+    edge.inPertinent = true
+    edge.colorZwick = "yellow"
+    u.req.insertNodeReq(edge)
+    if (u.solvedZwick && !u.active){
+        forward(u)
     } 
 }
 
@@ -75,12 +79,12 @@ export function zwick(source: Node, nodes: Nodes, edges: Edges){
         const vertex = nodes[key]
         vertex.distanceZwick = Infinity
         vertex.prevZwick = null
-        vertex.out.reset()
+        vertex.outZwick.reset()
         vertex.in.reset()
         vertex.colorZwick = "blue"
         vertex.solvedZwick = false
         vertex.isOut = true
-        vertex.activate = false
+        vertex.active = false
         vertex.req = new SortedLinkedList<Edge>(compareFunc)
         vertexNum++
     }
@@ -115,7 +119,7 @@ export function zwick(source: Node, nodes: Nodes, edges: Edges){
             }
         }
 
-        while (Q.length > 0 && Q.peek().queueKey < 2 * ((P.length > 0 ? P.peek().queueKey : Infinity) - M)){
+        while (Q.length > 0 && Q.peek().weight < 2 * (min(P) - M)){
             let edge = Q.dequeue()
             let vertex = nodes[edge.source]
             let successor = nodes[edge.target]
@@ -128,7 +132,7 @@ export function zwick(source: Node, nodes: Nodes, edges: Edges){
     }
 }
 
-function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+export function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
     innerCycle = false
     lastEdgesGreen.value = []
     lastEdgesBlue.value = []
@@ -142,16 +146,16 @@ function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<numbe
     Q.clear()
     M = Infinity
     for(const key in nodes){
-        const vertex = nodes[key]
-        vertex.distanceZwick = Infinity
-        vertex.prevZwick = null
-        vertex.out.reset()
-        vertex.in.reset()
-        vertex.req = new SortedLinkedList<Edge>(compareFunc)
-        vertex.colorZwick = "blue"
-        vertex.solvedZwick = false
-        vertex.isOut = true
-        vertex.activate = false
+        const u = nodes[key]
+        u.distanceZwick = Infinity
+        u.prevZwick = null
+        u.outZwick.reset()
+        u.in.reset()
+        u.req = new SortedLinkedList<Edge>(compareFunc)
+        u.colorZwick = "blue"
+        u.solvedZwick = false
+        u.isOut = true
+        u.active = false
         vertexNum++
     }
     for (const key in edges){
@@ -170,6 +174,8 @@ function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
     solvedNum++
     v.solvedZwick = true
     numOfRelaxededges.value++
+    edge.colorZwick = "red"
+    v.colorZwick = "red"
     forward(v)
 }
 
@@ -192,16 +198,18 @@ export function oneStepZwick(step: number, source: Node, nodes: Nodes, edges: Ed
         delete lastEdgesGreen.value[key]
     }
 
-    if (!innerCycle){
+    // if (P.length == 0) {return -1}
+
+    if (!(Q.length > 0 && Q.peek().weight < 2 * (min(P) - M))){
         if (solvedNum != vertexNum && P.length > 0){
             let edge = P.dequeue()
             edge.isInPZwick = false
             lastEdgesGreen.value.push(edge)
-            edge.colorZwick = "red"
+            edge.colorZwick = "orange"
             let u = nodes[edge.source]
             u.colorZwick = "green"
             let v = nodes[edge.target]
-            v.colorZwick = "red"
+            v.colorZwick = "orange"
             lastNodeGreen.value = v
             forward(u)
 
@@ -220,10 +228,9 @@ export function oneStepZwick(step: number, source: Node, nodes: Nodes, edges: Ed
                 }
             }
         }
-        innerCycle = (Q.length > 0 && Q.peek().queueKey < 2 * ((P.length > 0 ? P.peek().queueKey : Infinity) - M))
         return
     }
-    if (innerCycle){
+    if ((Q.length > 0 && Q.peek().weight < 2 * (min(P) - M))){
         let edge = Q.dequeue()
         edge.colorZwick = "magenta"
         edge.isInQZwick = false
@@ -239,10 +246,67 @@ export function oneStepZwick(step: number, source: Node, nodes: Nodes, edges: Ed
             lastNodeBlue.value = v
         }
         if (!v.solvedZwick){
-            edge.inPertinent = true
             backward(v)
             request(u, v, nodes, edges)
         }
+        return
     }
-    innerCycle = (Q.length > 0 && Q.peek().queueKey < 2 * ((P.length > 0 ? P.peek().queueKey : Infinity) - M))
+}
+
+export function* Zwick(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+    source.distanceZwick = 0
+    source.solvedZwick = true
+    source.colorZwick = "green"
+    vertexNum = bfs(source, nodes, edges)
+    forward(source)
+    yield
+
+    while (solvedNum != vertexNum && P.length > 0){
+        let edge = P.dequeue()
+        edge.isInPZwick = false
+        
+        lastEdgesGreen.value.push(edge)
+        edge.colorZwick = "orange"
+        let u = nodes[edge.source]
+        let v = nodes[edge.target]
+        v.colorZwick = "orange"
+        lastNodeGreen.value = v
+        forward(u)
+
+        if (!v.solvedZwick){
+            relax(u, v, edge, numOfRelaxededges)
+
+            if (solvedNum == Math.ceil(vertexNum / 2)){
+                M = v.distanceZwick
+                for (const key in nodes){
+                    let w = nodes[key]
+
+                    if (!w.solvedZwick){
+                        backward(w)
+                    }
+                }
+            }
+        }
+        yield
+        
+        edge.colorZwick = "green"
+        v.colorZwick = "green"
+
+        while ((Q.length > 0 && Q.peek().weight < 2 * (min(P) - M))){
+            let edge = Q.dequeue()
+            edge.isInQZwick = false
+            let lastColor = edge.colorZwick
+            edge.colorZwick = "magenta"
+            
+            let u = nodes[edge.source]
+            let v = nodes[edge.target]
+
+            if (!v.solvedZwick){
+                backward(v)
+                request(u, v, nodes, edges)
+            }
+            yield
+            if (!(edge.colorZwick == "gray")) { edge.colorZwick = lastColor }
+        }   
+    }
 }

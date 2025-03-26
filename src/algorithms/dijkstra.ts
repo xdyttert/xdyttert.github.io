@@ -101,5 +101,39 @@ export function oneStepDijkstra(step: number, source: Node, nodes: Nodes, edges:
             }
         };
         u.solvedDijkstra = true;
+        return
+    }
+    return -1
+}
+
+export function* Dijkstra(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+    source.distanceDijkstra = 0;
+    Q.queue(source)
+    source.isInQDijkstra = true
+    yield
+
+    while (Q.length > 0){
+        let scannedEdges: Edge[] = []
+        const u = Q.dequeue()
+        u.isInQDijkstra = false
+        u.colorDijkstra = "green"
+        u.solvedDijkstra = true
+
+        for (const edge of u.outDijkstra){
+            console.log(edge)
+            const v = nodes[edge.target]
+
+            scannedEdges.push(edge)
+            edge.colorDijkstra = "orange"
+            if (u.distanceDijkstra + edge.weight < v.distanceDijkstra){
+                relax(u, v, edge, numOfRelaxededges)
+            }
+        }
+
+        yield
+        console.log(scannedEdges)
+        for (const key in scannedEdges){
+            scannedEdges[key].colorDijkstra = "green"
+        }
     }
 }

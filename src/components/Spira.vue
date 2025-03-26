@@ -2,7 +2,7 @@
 import type { Edges, Layouts, Nodes } from "v-network-graph";
 import * as vNG from "v-network-graph";
 import { inject, ref, type Ref } from "vue";
-import { oneStepSpira, spira } from "../algorithms/spira";
+import { initialization, oneStepSpira, spira, Spira } from "../algorithms/spira";
 import data from "../data/startingGraph";
 import GraphAlgorithm from "./GraphAlgorithm.vue";
 import { updateNodes, updateEdges } from "../utils/utils";
@@ -16,6 +16,8 @@ const graph = ref<vNG.Instance>()
 const selectedNodes: Ref<string[], string[]> = inject("selectedNodesProv")!
 const selectedEdges: Ref<string[], string[]> = inject("selectedEdgesProv")!
 
+let relaxedEdgesSpira = 0
+
 const spiraStep = ref(0)
 
 const layouts: Layouts = inject("layouts")!
@@ -28,7 +30,9 @@ function resetSpira(){
 <template>
   <GraphAlgorithm
     label="Spira"
-    :algorithm="oneStepSpira"
+    :initialization="initialization"
+    :iterator="Spira"
+    :numOfRelaxedEdges="ref(relaxedEdgesSpira)"
     :step="ref(spiraStep)"
     :reset="resetSpira"
     :nodes="nodes"

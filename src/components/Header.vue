@@ -6,8 +6,6 @@ import { SortedLinkedList } from "../data/linkedList";
 import data, { compareFunc } from "../data/startingGraph";
 import { updateNodes, updateEdges, getEdge } from "../utils/utils";
 
-
-
 const nodes: Nodes = inject("nodes")!
 const edges: Edges = inject("edges")!
 
@@ -33,13 +31,19 @@ const show: ShowType = inject("show")!
 function addNode() {
   const nodeId = `node${nextNodeIndex.value}`
   const name = `N${nextNodeIndex.value}`
-  nodes[nodeId] = { name, distanceDijkstra: 0, distanceSpira: 0, distanceZwick: 0, 
-                         solved: false, prev: null, 
-                         colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", 
-                         out: new SortedLinkedList<Edge>(compareFunc), in: new SortedLinkedList<Edge>(compareFunc) }
+  nodes[nodeId] = { name: name, distanceDijkstra: 0, distanceSpira: 0, distanceZwick: 0, 
+                    isInQDijkstra: false, 
+                    solvedDijkstra: false, solvedSpira: false, solvedZwick: false, 
+                    prevDijkstra: null, prevSpira: null, prevZwick: null, 
+                    colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", 
+                    isOut: true, active: true, 
+                    outDijkstra: [],
+                    outSpira: new SortedLinkedList<Edge>(compareFunc), 
+                    outZwick: new SortedLinkedList<Edge>(compareFunc), 
+                    in: new SortedLinkedList<Edge>(compareFunc), 
+                    req: new SortedLinkedList<Edge>(compareFunc) },
   layouts.nodes[nodeId] = {x: 360, y: -50}
   nextNodeIndex.value++
-  console.log(data.layouts)
   updateNodes(nodes)
 }
 
@@ -60,12 +64,11 @@ function removeNode() {
       }
     }
     removeEdge()
-    // delete data.nodes[nodeId]
     delete nodes[nodeId]
+    delete layouts.nodes[nodeId]
   }
   selectedNodes.value = []
   selectedEdges.value = pastSelectedEdges
-  console.log(selectedEdges)
 }
 
 function addEdge() {
@@ -76,12 +79,29 @@ function addEdge() {
   let existingEdge = getEdge(source, target, edges)
 
   if (existingEdge.source != "null") { alert('Edge from node "' + s.name + '" to node "' + t.name + '" already exists.'); return }
+
+  let newEdgeWeight = 0
+
+  let newWeightString = (document.getElementById("weightInput")! as HTMLInputElement).value
+  let newWeight = Number(newWeightString)
+  if (!Number.isNaN(newWeight) && newWeight >= 0) { newEdgeWeight = newWeight }
+
   const edgeId = `edge${nextEdgeIndex.value}`
-  const edge = { source, target, weight: 0, queueKey: 0, 
-                 colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue" }
+  const edge = { source: source, target: target, weight: newEdgeWeight, 
+                 colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", 
+                 queueKeySpira: 0, QKeyZwick: 0, PKeyZwick: 0, 
+                 isInPSpira: false, 
+                 isInQZwick: false, isInPZwick: false, 
+                 inPertinent: false, outPertinent: false }
   edges[edgeId] = edge
-  s.out.insertNode(edge)
+  s.outSpira.insertNode(edge)
+  s.outZwick.insertNode(edge)
+  s.outDijkstra.push(edge)
   t.in.insertNode(edge)
+
+  s.outSpira.reset()
+  s.outZwick.reset()
+  t.in.reset()
   nextEdgeIndex.value++
 }
 
@@ -90,8 +110,12 @@ function removeEdge() {
     let edge = edges[edgeId]
     let source = nodes[edge.source]
     let target = nodes[edge.target]
-    source.out.deleteNode(edge)
+
+    source.outZwick.deleteNode(edge)
+    source.outSpira.deleteNode(edge)
+    source.outDijkstra = source.outDijkstra.filter((e: Edge) => e != edge)
     target.in.deleteNode(edge)
+    
     delete edges[edgeId]
   }
   selectedEdges.value = []
@@ -100,13 +124,28 @@ function removeEdge() {
 function updateEdgeWeight(){
   let newWeightString = (document.getElementById("weightInput")! as HTMLInputElement).value
   let newWeight = Number(newWeightString)
-  if (Number.isNaN(newWeight) || newWeight < 0) { alert('Wrong edge weight "' + newWeightString + '". Please input nonnegative number.'); return } //TODO error 
+  if (Number.isNaN(newWeight) || newWeight < 0) { 
+    alert('Wrong edge weight "' + newWeightString + '". Please input nonnegative number.'); 
+    return 
+  }
+
   for(const edgeId of selectedEdges.value){
-    nodes[edges[edgeId].source].out.deleteNode(edges[edgeId])
-    nodes[edges[edgeId].target].in.deleteNode(edges[edgeId])
-    edges[edgeId].weight = newWeight
-    nodes[edges[edgeId].source].out.insertNode(edges[edgeId])
-    nodes[edges[edgeId].target].in.insertNode(edges[edgeId])
+    let source = nodes[edges[edgeId].source]
+    let target = nodes[edges[edgeId].target]
+    let edge = edges[edgeId]
+
+    source.outSpira.deleteNode(edge)
+    source.outZwick.deleteNode(edge)
+    target.in.deleteNode(edge)
+    source.outDijkstra = source.outDijkstra.filter((e: Edge) => e != edge)
+
+    let newEdge = edges[edgeId]
+    newEdge.weight = newWeight
+
+    source.outSpira.insertNode(newEdge)
+    source.outZwick.insertNode(newEdge)
+    target.in.insertNode(newEdge)
+    source.outDijkstra.push(newEdge)
   }
   updateEdges(edges);
 }
@@ -129,7 +168,7 @@ function updateEdgeWeight(){
     
       <div class="edge-weight">
         <el-button :disabled="selectedEdges.length == 0" @click="updateEdgeWeight">update edge weight</el-button>
-        <input class="text-input" type="integer" id="weightInput" placeholder="input new edge weight">
+        <input class="text-input" type="integer" id="weightInput" placeholder="input edge weight">
       </div>
 
       <div>

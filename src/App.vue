@@ -43,7 +43,7 @@ provide("show", show)
   <div id="app">
     <Header />
     <div class="container">
-      <Dijkstra class="section" v-if="show.dijkstra"/> 
+      <Dijkstra class="section" v-if="show.dijkstra"/>
       <Spira class="section" v-if="show.spira"/>
       <Zwick class="section" v-if="show.zwick"/>
     </div>
@@ -70,7 +70,13 @@ export default defineComponent({
   width: 100%;
   height: 100%;
 }
-
+@media (max-width: 1000px) { 
+  .container {
+    flex-direction: column;
+    overflow-y: auto;
+    position: relative;
+  }
+}
 /* Optional: Styling for each section */
 .section {
   flex: 1;
@@ -103,6 +109,7 @@ export default defineComponent({
   color: #000000;
   font-weight: bold;
   border: 0.5px solid #000000;
+  position: relative;
 }
 .el-button:disabled {
   opacity: 1;

@@ -2,7 +2,8 @@
 import type { Edges, Layouts, Nodes } from "v-network-graph";
 import * as vNG from "v-network-graph";
 import { inject, ref, type Ref } from "vue";
-import { oneStepZwick, zwick } from "../algorithms/zwick";
+import { oneStepZwick, zwick, Zwick } from "../algorithms/zwick";
+import { initialization } from "../algorithms/zwick";
 import data from "../data/startingGraph";
 import GraphAlgorithm from "./GraphAlgorithm.vue";
 import { updateNodes, updateEdges } from "../utils/utils";
@@ -14,6 +15,8 @@ const graph = ref<vNG.Instance>()
 
 const selectedNodes: Ref<string[], string[]> = inject("selectedNodesProv")!
 const selectedEdges: Ref<string[], string[]> = inject("selectedEdgesProv")!
+
+const relaxedEdgesZwick = ref(0)
 
 const zwickStep = ref(0)
 
@@ -27,7 +30,9 @@ function resetZwick(){
 <template>
   <GraphAlgorithm
     label="Wilson-Zwick"
-    :algorithm="oneStepZwick"
+    :initialization="initialization"
+    :iterator="Zwick"
+    :numOfRelaxedEdges="ref(relaxedEdgesZwick)"
     :step="ref(zwickStep)"
     :reset="resetZwick"
     :nodes="nodes"
@@ -48,6 +53,7 @@ function resetZwick(){
   
   <script lang="ts">
   import { defineComponent } from "vue";
+
   
   export default defineComponent({
     name: "Zwick",

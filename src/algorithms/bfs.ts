@@ -7,12 +7,13 @@ const Q: PriorityQueue<Node> = new PriorityQueue({comparator: () => 1})
 
 export function bfs(root: Node, nodes: Nodes, edges: Edges): number{
     let explored = 0
+    const exploredBFS = new Map<Node, boolean>()
     Q.clear()
     for (const key in nodes){
         let u = nodes[key]
-        u.exploredBFS = false
+        exploredBFS.set(u, false)
     }
-    root.exploredBFS = true
+    exploredBFS.set(root, true)
     explored++
     Q.queue(root)
     while(Q.length > 0){
@@ -22,8 +23,8 @@ export function bfs(root: Node, nodes: Nodes, edges: Edges): number{
             let edge = edges[key]
             if (nodes[edge.source] == u){
                 let v = nodes[edge.target]
-                if (!v.exploredBFS){
-                    v.exploredBFS = true
+                if (!exploredBFS.get(v)){
+                    exploredBFS.set(v, true)
                     explored++
                     Q.queue(v)
                 }

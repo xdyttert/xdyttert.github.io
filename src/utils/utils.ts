@@ -40,13 +40,13 @@ export function forwardStepAlgorithm(algorithm: Function, step: number,
     if (step == 0 || step == 1){
         startingNode = findNodeByName(nodes, startingNodeName.value)
     }
-    algorithm(step, startingNode, nodes, edges, numOfRelaxededges);
+    if (algorithm(step, startingNode, nodes, edges, numOfRelaxededges) == -1) {step = -2}
     updateNodes(nodes);
     updateEdges(edges);
     return [step + 1, numOfRelaxededges.value];
 }
 
-function findNodeByName(nodes: Nodes, name: string){
+export function findNodeByName(nodes: Nodes, name: string){
     for(const key in nodes){
         if (nodes[key].name == name){
             return nodes[key]
@@ -63,4 +63,8 @@ export function shortestPathsTree(nodes: Nodes, edges: Edges, prev: keyof Node, 
     }
     console.log(edges)
     updateEdges(edges)
+}
+
+export function wait(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

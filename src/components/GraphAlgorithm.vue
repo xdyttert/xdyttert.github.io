@@ -1,18 +1,28 @@
 <script setup lang="ts">
-import { type Nodes, type Edges, type Edge, type Node, type VNetworkGraphInstance } from "v-network-graph";
+import { type Nodes, type Edges, type Edge, type Node, type VNetworkGraphInstance, type Layouts } from "v-network-graph";
 import { defineProps, defineEmits, type Ref, ref, provide, inject, onMounted, nextTick } from "vue";
-import { forwardStepAlgorithm, shortestPathsTree } from "../utils/utils";
-import { showPertinent } from "@/utils/store";
+import { findNodeByName, forwardStepAlgorithm, shortestPathsTree, wait } from "../utils/utils";
+import { showPertinent, animate, type Animate } from "@/utils/store";
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
-
   
 const props = defineProps<{
   label: String,
-  algorithm: Function,
+  initialization: (
+    nodes: Nodes,
+    edges: Edges,
+    numOfRelaxededges: Ref<number>
+  ) => void,
+  iterator: (
+    source: Node,
+    nodes: Nodes,
+    edges: Edges,
+    numOfRelaxededges: Ref<number>
+  ) => Generator<any, void, unknown>,
+  numOfRelaxedEdges: Ref<number>
   nodes: Nodes,
   edges: Edges,
-  layouts: Object,
+  layouts: Layouts,
   configs: Object,
   selectedNodes: Array<string>,
   selectedEdges: Array<string>,
@@ -26,11 +36,30 @@ const props = defineProps<{
 const distanceKeyt = props.distanceKey as keyof Node
 const QKeyt = props.QKey as keyof Edge
 const PKeyt = props.PKey as keyof Edge
-let step = 0
-let numOfrelaxedEdges = ref(0)
 const colorKey = props.cKey as keyof Edge
 const prevKey = props.prKey as keyof Node
-  
+const animateKey = (props.label == "Wilson-Zwick" ? "zwick" : props.label.toLowerCase()) as keyof Animate 
+const layers = {
+  badge: "nodes",
+}
+const graph = ref<VNetworkGraphInstance | null>(null);
+
+const fitGraphToContainer = () => {
+  if (graph.value) {
+    graph.value.fitToContents({
+      margin: {
+        top: 10,
+        left: 10,
+        right: 10,
+        bottom: (window.innerWidth < 1000 ? 70 : 130)
+      },
+    });
+  }
+};
+
+let iteratorAlg: Generator<any, void, unknown> | null = null
+props.initialization(props.nodes, props.edges, ref(props.numOfRelaxedEdges))
+
 const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
   
 const updateSelectedNodes = (newValue: Ref<string[], string[]>) => {
@@ -41,34 +70,25 @@ const updateSelectedEdges = (newValue: Ref<string[], string[]>) => {
   emit("update:selectedEdges", newValue);
 };
 
-const graph = ref<VNetworkGraphInstance | null>(null);
-
-const fitGraphToContainer = () => {
-  if (graph.value) {
-    graph.value.fitToContents({
-      margin: {
-        top: 10,
-        left: 10,
-        right: 10,
-        bottom: 130,
-      },
-    });
-  }
-};
-
-  function resetS(algorithm: Function, nodes: Nodes, edges: Edges){
-      step = 0
-      const result = forwardStepAlgorithm(algorithm, step, ref(startingNodeName), nodes, edges, ref(numOfrelaxedEdges))
-      step = result[0]
-      numOfrelaxedEdges.value = result[1]
+function reset(){
+  props.initialization(props.nodes, props.edges, ref(props.numOfRelaxedEdges))
+  iteratorAlg = null
   }
 
-function runAlg(algorithm: Function, nodes: Nodes, edges: Edges){
-      const result = forwardStepAlgorithm(algorithm, step, ref(startingNodeName), nodes, edges, ref(numOfrelaxedEdges))
-      step = result[0]
-      numOfrelaxedEdges.value = result[1]
+function runAlgorithm(){
+  if (iteratorAlg == null){
+      iteratorAlg = props.iterator(findNodeByName(props.nodes, startingNodeName.value), props.nodes, props.edges, ref(props.numOfRelaxedEdges))
   }
-  
+  iteratorAlg.next()
+}
+
+async function animateAlgorithm(){
+  while(animate[animateKey]){
+    await wait(700)
+    if (iteratorAlg == null) { iteratorAlg = props.iterator(findNodeByName(props.nodes, startingNodeName.value), props.nodes, props.edges, ref(props.numOfRelaxedEdges)) }
+    if (iteratorAlg.next().done){ animate[animateKey] = false }
+  }
+}
 </script>
   
   <template>
@@ -76,8 +96,9 @@ function runAlg(algorithm: Function, nodes: Nodes, edges: Edges){
       <div class="section-header">
         <div>
           <label class="label label-colored"> {{ label }}: </label>
-          <el-button @click="runAlg(algorithm, nodes, edges)">></el-button>
-          <el-button @click="resetS(algorithm, nodes, edges)">reset</el-button>
+          <el-button @click="runAlgorithm">></el-button>
+          <el-button :class="{ active: animate[animateKey] }" @click="animate[animateKey] = !animate[animateKey]; animateAlgorithm"> {{ animate[animateKey] ? "||" : ">>" }} </el-button>
+          <el-button @click="reset">reset</el-button>
           <el-button @click="shortestPathsTree(nodes, edges, prevKey, colorKey)">SPT</el-button>
 
           <el-button @click="fitGraphToContainer">fit</el-button>
@@ -91,7 +112,7 @@ function runAlg(algorithm: Function, nodes: Nodes, edges: Edges){
           </div>
         </div>
         <div class="relaxed-edges">
-          <label class="label label-colored"> {{ numOfrelaxedEdges }} </label>
+          <label class="label label-colored"> {{ numOfRelaxedEdges }} </label>
           <label class="label label-colored"> relaxed edges</label>
         </div>
       </div>
@@ -107,6 +128,7 @@ function runAlg(algorithm: Function, nodes: Nodes, edges: Edges){
           @update:selected-nodes="updateSelectedNodes"
           @update:selected-edges="updateSelectedEdges"
           ref="graph"
+          :layers="layers"
         >
         
           <template #override-node-label="{ nodeId, scale, x, y, config, textAnchor, dominantBaseline }">
@@ -117,6 +139,18 @@ function runAlg(algorithm: Function, nodes: Nodes, edges: Edges){
               :dominant-baseline="dominantBaseline" :fill="config.color" :transform="`translate(${x} ${y})`">
               {{ ( nodes[nodeId][distanceKeyt] == Infinity ? '∞' : nodes[nodeId][distanceKeyt]) }}
             </text>
+          </template>
+
+          <template v-if="label == 'Wilson-Zwick'" #badge="{ scale }">
+          <circle
+            v-for="(pos, node) in layouts.nodes"
+            :key="node"
+            :cx="pos.x + 9 * scale"
+            :cy="pos.y - 9 * scale"
+            :r="4 * scale"
+            :fill="nodes[node].isOut ? '#00cc00' : '#ff5555'"
+            style="pointer-events: none"
+          />
           </template>
   
           <template #edge-label="{ edge, ...slotProps }">

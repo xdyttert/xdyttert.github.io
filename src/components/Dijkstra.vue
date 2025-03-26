@@ -2,7 +2,7 @@
 import type { Edges, Layouts, Nodes } from "v-network-graph";
 import * as vNG from "v-network-graph";
 import { inject, ref, type Ref } from "vue";
-import { dijkstra, oneStepDijkstra } from "../algorithms/dijkstra";
+import { dijkstra, oneStepDijkstra, Dijkstra, initialization } from "../algorithms/dijkstra";
 import data from "../data/startingGraph";
 import GraphAlgorithm from "./GraphAlgorithm.vue";
 import { updateNodes, updateEdges } from "../utils/utils";
@@ -14,6 +14,8 @@ const graph = ref<vNG.Instance>()
 
 const selectedNodes: Ref<string[], string[]> = inject("selectedNodesProv")!
 const selectedEdges: Ref<string[], string[]> = inject("selectedEdgesProv")!
+
+let relaxedEdgesDijkstra = 0
 
 const dijkstraStep = ref(0)
 
@@ -29,7 +31,9 @@ function resetDijkstra(){
 <template>
   <GraphAlgorithm
     label="Dijkstra"
-    :algorithm="oneStepDijkstra"
+    :initialization="initialization"
+    :iterator="Dijkstra"
+    :numOfRelaxedEdges="ref(relaxedEdgesDijkstra)"
     :step="ref(dijkstraStep)"
     :reset="resetDijkstra"
     :nodes="nodes"
