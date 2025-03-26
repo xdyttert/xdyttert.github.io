@@ -100,7 +100,7 @@ async function animateAlgorithm(){
         <div>
           <label class="label label-colored"> {{ label }}: </label>
           <el-button @click="runAlgorithm">></el-button>
-          <el-button :class="{ active: animate[animateKey] }" @click="animate[animateKey] = !animate[animateKey]; animateAlgorithm"> {{ animate[animateKey] ? "||" : ">>" }} </el-button>
+          <el-button :class="{ active: animate[animateKey] }" @click="animate[animateKey] = !animate[animateKey]; animateAlgorithm()"> {{ animate[animateKey] ? "||" : ">>" }} </el-button>
           <el-button @click="reset">reset</el-button>
           <el-button @click="shortestPathsTree(nodes, edges, prevKey, colorKey)">SPT</el-button>
 
