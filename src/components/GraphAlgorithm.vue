@@ -3,6 +3,7 @@ import { type Nodes, type Edges, type Edge, type Node, type VNetworkGraphInstanc
 import { defineProps, defineEmits, type Ref, ref, provide, inject, onMounted, nextTick } from "vue";
 import { findNodeByName, forwardStepAlgorithm, shortestPathsTree, updateEdges, updateNodes, wait } from "../utils/utils";
 import { showPertinent, animate, type Animate } from "../utils/store";
+import { ZwickConstants } from "../utils/store"
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
 
@@ -11,8 +12,6 @@ const edges: Edges = inject("edges")!
 
 const selectedNodes: Ref<string[], string[]> = inject("selectedNodesProv")!
 const selectedEdges: Ref<string[], string[]> = inject("selectedEdgesProv")!
-
-let M = inject("M")!
   
 const props = defineProps<{
   label: String,
@@ -122,9 +121,9 @@ async function animateAlgorithm(){
             <label class="label label-colored"> relaxed edges</label>
           </div>
           
-          <div>
-            <label class="label label-colored">M: </label>
-            <label class="label label-colored">{{ M }}</label>
+          <div v-if="label=='Wilson-Zwick'">
+          <label class="label label-colored">M: </label>
+          <label class="label label-colored">{{ (ZwickConstants.M == Infinity ? '∞' : ZwickConstants.M ) }}</label>
           </div>
         </div>
       </div>

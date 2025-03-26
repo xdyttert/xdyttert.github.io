@@ -1,5 +1,4 @@
-import { dijkstra } from "@/algorithms/dijkstra";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 
 export const showPertinent = reactive({
   in: false,
@@ -17,3 +16,7 @@ export interface Animate {
   spira: boolean,
   zwick: boolean
 }
+
+export const ZwickConstants = reactive({
+  M: Infinity
+})

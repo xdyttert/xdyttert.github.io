@@ -2,18 +2,18 @@ import data, { compareFunc } from "@/data/startingGraph"
 import { SortedLinkedList } from "@/data/linkedList"
 import PriorityQueue from "ts-priority-queue"
 import type { Edge, Edges, Node, Nodes } from "v-network-graph"
-import { provide, ref, type Ref } from "vue"
+import { inject, provide, ref, type Ref } from "vue"
 import { fa, tr } from "element-plus/es/locales.mjs"
 import { getEdge, getNodeId } from "@/utils/utils"
 import { bfs } from "./bfs"
+import { ZwickConstants } from "../utils/store"
 
 const P = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.PKeyZwick - edge2.PKeyZwick})
 const Q = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.weight - edge2.weight})
 let solvedNum = 0
 let vertexNum = 0
-let M: number = Infinity
 
-provide("M", M)
+console.log(ZwickConstants.M)
 
 function min(P: PriorityQueue<Edge>){
     if (P.length == 0){ return Infinity }
@@ -25,7 +25,7 @@ function forward(u: Node){
     if (u.isOut){
         edge = u.outZwick.next()
         
-        if (edge == null || edge.weight > 2*(M - u.distanceZwick)){
+        if (edge == null || edge.weight > 2*(ZwickConstants.M - u.distanceZwick)){
             u.isOut = false
         }
         
@@ -65,7 +65,7 @@ function request(u: Node, v: Node, nodes: Nodes, edges: Edges){
 }
 
 export function zwick(source: Node, nodes: Nodes, edges: Edges){
-    M = Infinity
+    ZwickConstants.M = Infinity
     P.clear()
     Q.clear()
     vertexNum = 0
@@ -103,7 +103,7 @@ export function zwick(source: Node, nodes: Nodes, edges: Edges){
             forward(successor)
 
             if (solvedNum == Math.ceil(vertexNum / 2)){
-                M = successor.distanceZwick
+                ZwickConstants.M = successor.distanceZwick
                 for (const key in nodes){
                     let notSolvedVertex = nodes[key]
 
@@ -114,7 +114,7 @@ export function zwick(source: Node, nodes: Nodes, edges: Edges){
             }
         }
 
-        while (Q.length > 0 && Q.peek().weight < 2 * (min(P) - M)){
+        while (Q.length > 0 && Q.peek().weight < 2 * (min(P) - ZwickConstants.M)){
             let edge = Q.dequeue()
             let vertex = nodes[edge.source]
             let successor = nodes[edge.target]
@@ -133,7 +133,7 @@ export function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Re
     solvedNum = 0
     P.clear()
     Q.clear()
-    M = Infinity
+    ZwickConstants.M = Infinity
     for(const key in nodes){
         const u = nodes[key]
         u.distanceZwick = Infinity
@@ -190,7 +190,7 @@ export function* Zwick(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededg
             relax(u, v, edge, numOfRelaxededges)
 
             if (solvedNum == Math.ceil(vertexNum / 2)){
-                M = v.distanceZwick
+                ZwickConstants.M = v.distanceZwick
                 for (const key in nodes){
                     let w = nodes[key]
 
@@ -205,7 +205,7 @@ export function* Zwick(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededg
         edge.colorZwick = "green"
         v.colorZwick = "green"
 
-        while ((Q.length > 0 && Q.peek().weight < 2 * (min(P) - M))){
+        while ((Q.length > 0 && Q.peek().weight < 2 * (min(P) - ZwickConstants.M))){
             let edge = Q.dequeue()
             edge.isInQZwick = false
             let lastColor = edge.colorZwick

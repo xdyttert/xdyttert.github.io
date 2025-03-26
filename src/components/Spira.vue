@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { inject, type Ref, ref } from "vue";
-import data from "../data/startingGraph"
-import { Spira, initialization } from "../algorithms/spira";
+import type { Edges, Layouts, Nodes } from "v-network-graph";
+import * as vNG from "v-network-graph";
+import { inject, ref, type Ref } from "vue";
+import { initialization, spira, Spira } from "../algorithms/spira";
+import data from "../data/startingGraph";
+import GraphAlgorithm from "./GraphAlgorithm.vue";
+import { updateNodes, updateEdges } from "../utils/utils";
 
 const selectedNodes: Ref<string[], string[]> = inject("selectedNodesProv")!
 const selectedEdges: Ref<string[], string[]> = inject("selectedEdgesProv")!
