@@ -88,8 +88,6 @@ async function animateAlgorithm(){
     if (iteratorAlg == null) { iteratorAlg = props.iterator(findNodeByName(props.nodes, startingNodeName.value), props.nodes, props.edges, ref(props.numOfRelaxedEdges)) }
     console.log("v cykle")
     if (iteratorAlg.next().done){ animate[animateKey] = false }
-    updateEdges(props.edges)
-    updateNodes(props.nodes)
   }
 }
 </script>
