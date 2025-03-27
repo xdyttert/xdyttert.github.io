@@ -7,6 +7,7 @@ import Spira from "./components/Spira.vue";
 import Zwick from "./components/Zwick.vue";
 import data from "./data/startingGraph";
 import { tr } from "element-plus/es/locales.mjs";
+import { type Node, type Edge, type Nodes, type Edges } from "./data/startingGraph";
 
 const selectedNodes = ref<string[]>([])
 const selectedEdges = ref<string[]>([])

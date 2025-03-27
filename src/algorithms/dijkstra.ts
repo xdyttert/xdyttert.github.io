@@ -1,39 +1,8 @@
 import PriorityQueue from "ts-priority-queue";
-import data from "../data/startingGraph"
-import { type Edge, type Edges, type Node, type Nodes, VNetworkGraph } from "v-network-graph";
-import { inject, ref, type Ref } from "vue";
-import { tr } from "element-plus/es/locales.mjs";
+import { type Ref } from "vue";
+import { type Edge, type Edges, type Node, type Nodes } from "../data/startingGraph";
 
 const Q = new PriorityQueue({comparator: (node1: Node, node2: Node) => node1.distanceDijkstra - node2.distanceDijkstra})
-
-export function dijkstra(source: Node, nodes: Nodes, edges: Edges){
-    Q.clear()
-    for (const key in nodes){
-        const u = nodes[key];
-        u.distanceDijkstra = Infinity;
-        u.prevDijkstra = null;
-        u.solvedDijkstra = false;
-    };
-    source.distanceDijkstra = 0;
-    Q.queue(source)
-
-    while (Q.length > 0){
-        const u = Q.dequeue()!;
-
-        for(const key in edges){
-            const v = nodes[edges[key].target]
-            if (nodes[edges[key].source] == u && !v.solvedDijkstra){
-                const newDistance = u.distanceDijkstra + edges[key].weight;
-                if (newDistance < v.distanceDijkstra){
-                    v.distanceDijkstra = newDistance;
-                    v.prevDijkstra = u
-                    Q.queue(v)
-                }
-            }
-        };
-        u.solvedDijkstra = true;
-    }
-}
 
 export function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
     Q.clear()

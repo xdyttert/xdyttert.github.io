@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { type Nodes, type Edges, type Edge, type Node, type VNetworkGraphInstance, type Layouts } from "v-network-graph";
+import { type VNetworkGraphInstance, type Layouts } from "v-network-graph";
 import { defineProps, defineEmits, type Ref, ref, provide, inject, onMounted, nextTick } from "vue";
-import { findNodeByName, forwardStepAlgorithm, shortestPathsTree, updateEdges, updateNodes, wait } from "../utils/utils";
+import { findNodeByName, shortestPathsTree, updateEdges, updateNodes, wait } from "../utils/utils";
 import { showPertinent, animate, type Animate } from "../utils/store";
 import { ZwickConstants } from "../utils/store"
+import { type Node, type Edge, type Nodes, type Edges } from "../data/startingGraph";
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
 
@@ -26,7 +27,8 @@ const props = defineProps<{
     edges: Edges,
     numOfRelaxededges: Ref<number>
   ) => Generator<any, void, unknown>,
-  numOfRelaxedEdges: Ref<number>
+  numOfRelaxedEdges: Ref<number>,
+  numOfScannedEdges: Ref<number>,
   configs: Object,
   distanceKey: String,
   cKey: String,

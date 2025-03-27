@@ -1,54 +1,18 @@
-import data from "@/data/startingGraph";
 import PriorityQueue from "ts-priority-queue";
-import { type Edge, type Edges, type Node, type Nodes } from "v-network-graph";
-import { inject, ref, type Ref } from "vue";
+import { type Ref } from "vue";
+import { type Edge, type Edges, type Node, type Nodes } from "../data/startingGraph";
 import { bfs } from "./bfs";
 
-const P = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.queueKeySpira - edge2.queueKeySpira})
+const P = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.PKeySpira - edge2.PKeySpira})
 let solvedNum = 0
 let vertexNum = 0
 
 function forward(vertex: Node){
     let edge = vertex.outSpira.next()
     if (edge != null){
-        edge.queueKeySpira = vertex.distanceSpira + edge.weight
+        edge.PKeySpira = vertex.distanceSpira + edge.weight
         P.queue(edge)
         edge.colorSpira = "gray"
-    }
-}
-
-export function spira(source: Node, nodes: Nodes, edges: Edges){
-    P.clear()
-    solvedNum = 0
-    vertexNum = 0
-    for(const key in nodes){
-        const vertex = nodes[key]
-        vertex.distanceSpira = Infinity
-        vertex.prevSpira = null
-        vertex.outSpira.reset()
-        vertex.colorSpira = "blue"
-        vertex.solvedSpira = false
-        vertexNum++
-    }
-    source.distanceSpira = 0
-    forward(source)
-
-    while(solvedNum != vertexNum && P.length > 0){
-        const edge = P.dequeue()
-        const vertex = nodes[edge.source]
-        const successor = nodes[edge.target]
-        forward(vertex)
-        if (!successor.solvedSpira){
-            successor.distanceSpira = vertex.distanceSpira + edge.weight
-            successor.prevSpira = vertex
-            solvedNum++
-            successor.solvedSpira = true
-            forward(successor)
-        }
-    }
-    for(const key in nodes){
-        const vertex = nodes[key]
-        vertex.colorSpira = "blue"
     }
 }
 

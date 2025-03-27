@@ -1,7 +1,47 @@
-import type { Edge, Edges, Nodes, Node } from "v-network-graph"
 import { ref, type Ref } from "vue"
+import { type Node, type Edge, type Nodes, type Edges, compareFunc } from "../data/startingGraph";
+import { SortedLinkedList } from "@/data/linkedList";
 
-let startingNode: Node = {}
+let arbitraryNode: Node = {
+    name: "",
+    distanceDijkstra: 0,
+    distanceSpira: 0,
+    distanceZwick: 0,
+    isInQDijkstra: false,
+    exploredBFS: false,
+    solvedDijkstra: false,
+    solvedSpira: false,
+    solvedZwick: false,
+    prevDijkstra: null,
+    prevSpira: null,
+    prevZwick: null,
+    colorDijkstra: "",
+    colorSpira: "",
+    colorZwick: "",
+    isOut: false,
+    active: false,
+    outDijkstra: [],
+    outSpira: new SortedLinkedList<Edge>(compareFunc),
+    outZwick: new SortedLinkedList<Edge>(compareFunc),
+    in: new SortedLinkedList<Edge>(compareFunc),
+    req: new SortedLinkedList<Edge>(compareFunc)
+}
+
+const arbitraryEdgeWithNullSource: Edge = { 
+    source: "null", 
+    target: "node2", 
+    weight: 5, 
+    colorDijkstra: "blue", 
+    colorSpira: "blue", 
+    colorZwick: "blue", 
+    PKeySpira: 0,
+    PKeyZwick: 0, 
+    isInPSpira: false, 
+    isInQZwick: false, 
+    isInPZwick: false, 
+    inPertinent: false, 
+    outPertinent: false 
+}
 
 export function updateNodes(nodes: Nodes){
     for(const key in nodes){
@@ -15,14 +55,14 @@ export function updateEdges(edges: Edges){
     }
 }
 
-export function getEdge(sourceId: string, targetId: String, edges: Edges){
+export function getEdge(sourceId: string, targetId: String, edges: Edges): Edge | null {
     for (const key in edges){
         let edge = edges[key]
         if (edge.source == sourceId && edge.target == targetId){
             return edge
         }
     }
-    return { source: "null", target: "null", weight: 5, colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", queueKey: 0, isInQDijkstra: false, isInPDijkstra: false, isInQSpira: false, isInPSpira: false, isInQZwick: false, isInPZwick: false }
+    return null
 }
 
 export function getNodeId(node: Node, nodes: Nodes){
@@ -34,32 +74,20 @@ export function getNodeId(node: Node, nodes: Nodes){
     return ""
 }
 
-export function forwardStepAlgorithm(algorithm: Function, step: number, 
-                                     startingNodeName: Ref<string>,
-                                     nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>): [number, number]{
-    if (step == 0 || step == 1){
-        startingNode = findNodeByName(nodes, startingNodeName.value)
-    }
-    if (algorithm(step, startingNode, nodes, edges, numOfRelaxededges) == -1) {step = -2}
-    updateNodes(nodes);
-    updateEdges(edges);
-    return [step + 1, numOfRelaxededges.value];
-}
-
 export function findNodeByName(nodes: Nodes, name: string){
     for(const key in nodes){
         if (nodes[key].name == name){
             return nodes[key]
         }
     }
-    return {}
+    return arbitraryNode
 }
 
 export function shortestPathsTree(nodes: Nodes, edges: Edges, prev: keyof Node, color: keyof Edge){
     for(const key in nodes){
         let u = nodes[key]
-        let treeEdge = getEdge(getNodeId(u[prev], nodes), getNodeId(u, nodes), edges)
-        treeEdge[color] = "brown"
+        let treeEdge: Edge = getEdge(getNodeId(u[prev] as Node, nodes), getNodeId(u, nodes), edges)!;
+        (treeEdge as any)[color] = "brown"
     }
     console.log(edges)
     updateEdges(edges)

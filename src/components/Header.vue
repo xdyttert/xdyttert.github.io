@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { type Edge, type Edges, type Layouts, type Node, type Nodes, type VNetworkGraph, type VNetworkGraphInstance} from "v-network-graph";
-import * as vNG from "v-network-graph";
-import { inject, provide, ref, type Ref } from "vue";
+import { type Layouts } from "v-network-graph";
+import { inject, ref, type Ref } from "vue";
 import { SortedLinkedList } from "../data/linkedList";
-import data, { compareFunc } from "../data/startingGraph";
-import { updateNodes, updateEdges, getEdge } from "../utils/utils";
+import { compareFunc, type Edge, type Edges, type Nodes } from "../data/startingGraph";
+import { getEdge, updateEdges, updateNodes } from "../utils/utils";
 
 const nodes: Nodes = inject("nodes")!
 const edges: Edges = inject("edges")!
@@ -31,7 +30,8 @@ function addNode() {
   const nodeId = `node${nextNodeIndex.value}`
   const name = `N${nextNodeIndex.value}`
   nodes[nodeId] = { name: name, distanceDijkstra: 0, distanceSpira: 0, distanceZwick: 0, 
-                    isInQDijkstra: false, 
+                    isInQDijkstra: false,
+                    exploredBFS: false,
                     solvedDijkstra: false, solvedSpira: false, solvedZwick: false, 
                     prevDijkstra: null, prevSpira: null, prevZwick: null, 
                     colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", 
@@ -77,7 +77,7 @@ function addEdge() {
   let t = nodes[target]
   let existingEdge = getEdge(source, target, edges)
 
-  if (existingEdge.source != "null") { alert('Edge from node "' + s.name + '" to node "' + t.name + '" already exists.'); return }
+  if (existingEdge != null) { alert('Edge from node "' + s.name + '" to node "' + t.name + '" already exists.'); return }
 
   let newEdgeWeight = 0
 
@@ -88,7 +88,7 @@ function addEdge() {
   const edgeId = `edge${nextEdgeIndex.value}`
   const edge = { source: source, target: target, weight: newEdgeWeight, 
                  colorDijkstra: "blue", colorSpira: "blue", colorZwick: "blue", 
-                 queueKeySpira: 0, QKeyZwick: 0, PKeyZwick: 0, 
+                 PKeySpira: 0, QKeyZwick: 0, PKeyZwick: 0, 
                  isInPSpira: false, 
                  isInQZwick: false, isInPZwick: false, 
                  inPertinent: false, outPertinent: false }
@@ -175,7 +175,7 @@ function updateEdgeWeight(){
         <el-select class="selection" 
                   v-model="startingNodeName">
           <el-option class="option" v-for="node in nodes"
-          :key="node.id"
+          :key="node.name"
           :label="node.name"
           :value="node.name"
           >
