@@ -1,0 +1,141 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wilson-Zwick help</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;  
+            justify-content: flex-start; 
+            gap: 0px;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .image {
+            margin-right: 15px;
+        }
+        img {
+            max-width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        Wilson-Zwick help
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/activeNode.png" alt="Description of Image 1">
+            </div>
+            <div class="description">
+                <p>Node looks like this. Node has a name in the center and discoverd distance (N1.d) below.</p>
+                <p>Also in top right it shows if the node is active.</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/discoveredNodeZwick.png" alt="Description of Image 1">
+            </div>
+            <div class="description">
+                <p>Node that is discovered turns red like this.</p>
+                <p>Also this node is not active.</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/nonActiveNode.png" alt="Description of Image 3">
+            </div>
+            <div class="description">
+                <p>Nodes that are solved are green like this.</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/nodesAndEdgeZwick.png" alt="Description of Image 1">
+            </div>
+            <div class="description">
+                <p>Edges look like this. Edge has its weight c(N1, N2) above.</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/edgeInPQueue.png" alt="Description of Image 2">
+            </div>
+            <div class="description">
+                <p>When edge is appended to P queue it turns gray.</p>
+                <p>Also edge has a small P that indicates that the edge is in P.</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/edgeInQQueue.png" alt="Description of Image 2">
+            </div>
+            <div class="description">
+                <p>When edge is in Q queue it has small Q that indicates it.</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/edgeInBothQueues.png" alt="Description of Image 2">
+            </div>
+            <div class="description">
+                <p>Edge can be in both queues so it will have both Q and P like this.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/edgeExtractedFromQ.png" alt="Description of Image 2">
+            </div>
+            <div class="description">
+                <p>When edge is extracted from Q queue it turns yellow like this.</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/requestedEdge.png" alt="Description of Image 2">
+            </div>
+            <div class="description">
+                <p>When edge is requested it turns purple like this.</p>
+            </div>
+        </div>
+
+
+
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/outPertinentEdge.png" alt="Description of Image 2">
+            </div>
+            <div class="description">
+                <p>When algorithm thinks the edge is out-pertinent it gets dashed like this.</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="image">
+                <img src="./picturesWilsonZwick/inPertinentEdge.png" alt="Description of Image 2">
+            </div>
+            <div class="description">
+                <p>When algorithm thinks the edge is in-pertinent it gets dot-dashed like this.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
