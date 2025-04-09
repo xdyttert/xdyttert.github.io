@@ -52,14 +52,15 @@ function backward(u: Node){
 function request(u: Node, edge: Edge){
     edge.inPertinent = true
     edge.colorZwick = "yellow"
-    u.req.insertNodeReq(edge)
+    u.req.insertNode(edge)
     if (u.solvedZwick && !u.active){
         forward(u)
     } 
 }
 
-export function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+export function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>, numOfScannedEdges: Ref<number>){
     numOfRelaxededges.value = 0
+    numOfScannedEdges.value = 0
     vertexNum = 0
     solvedNum = 0
     P.clear()
@@ -99,7 +100,7 @@ function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
     forward(v)
 }
 
-export function* Zwick(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+export function* Zwick(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>, numOfScannedEdges: Ref<number>){
     source.distanceZwick = 0
     source.solvedZwick = true
     source.colorZwick = "green"
@@ -110,10 +111,10 @@ export function* Zwick(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededg
     while (solvedNum != vertexNum && P.length > 0){
         let edge = P.dequeue()
         edge.isInPZwick = false
-        
+        numOfScannedEdges.value++
+
         let u = nodes[edge.source]
         let v = nodes[edge.target]
-        v.colorZwick = "orange"
         edge.colorZwick = "orange"
         forward(u)
 

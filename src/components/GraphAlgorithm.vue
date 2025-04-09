@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { type VNetworkGraphInstance, type Layouts } from "v-network-graph";
-import { defineProps, defineEmits, type Ref, ref, provide, inject, onMounted, nextTick } from "vue";
-import { findNodeByName, shortestPathsTree, updateEdges, updateNodes, wait } from "../utils/utils";
-import { showPertinent, animate, type Animate } from "../utils/store";
-import { ZwickConstants } from "../utils/store"
-import { type Node, type Edge, type Nodes, type Edges } from "../data/startingGraph";
+import { type Layouts, type VNetworkGraphInstance } from "v-network-graph";
+import { defineEmits, defineProps, inject, type Ref, ref } from "vue";
+import { type Edge, type Edges, type Node, type Nodes } from "../data/startingGraph";
+import { animate, type Animate, showPertinent, ZwickConstants } from "../utils/store";
+import { findNodeByName, shortestPathsTree, wait } from "../utils/utils";
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
 
@@ -19,13 +18,15 @@ const props = defineProps<{
   initialization: (
     nodes: Nodes,
     edges: Edges,
-    numOfRelaxededges: Ref<number>
+    numOfRelaxededges: Ref<number>,
+    numOfScannedEdges: Ref<number>
   ) => void,
   iterator: (
     source: Node,
     nodes: Nodes,
     edges: Edges,
-    numOfRelaxededges: Ref<number>
+    numOfRelaxededges: Ref<number>,
+    numOfScannedEdges: Ref<number>
   ) => Generator<any, void, unknown>,
   numOfRelaxedEdges: Ref<number>,
   numOfScannedEdges: Ref<number>,
@@ -35,6 +36,7 @@ const props = defineProps<{
   QKey: String,
   PKey: String,
   prKey: String,
+  helpSite: string,
 }>();
 
 const distanceKeyt = props.distanceKey as keyof Node
@@ -63,7 +65,7 @@ const fitGraphToContainer = () => {
 };
 
 let iteratorAlg: Generator<any, void, unknown> | null = null
-props.initialization(nodes, edges, ref(props.numOfRelaxedEdges))
+props.initialization(nodes, edges, ref(props.numOfRelaxedEdges), ref(props.numOfScannedEdges))
 
 const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
   
@@ -76,13 +78,13 @@ const updateSelectedEdges = (newValue: Ref<string[], string[]>) => {
 };
 
 function reset(){
-  props.initialization(nodes, edges, ref(props.numOfRelaxedEdges))
+  props.initialization(nodes, edges, ref(props.numOfRelaxedEdges), ref(props.numOfScannedEdges))
   iteratorAlg = null
-  }
+}
 
 function runAlgorithm(){
   if (iteratorAlg == null){
-      iteratorAlg = props.iterator(findNodeByName(nodes, startingNodeName.value), nodes, edges, ref(props.numOfRelaxedEdges))
+      iteratorAlg = props.iterator(findNodeByName(nodes, startingNodeName.value), nodes, edges, ref(props.numOfRelaxedEdges), ref(props.numOfScannedEdges))
   }
   iteratorAlg.next()
 }
@@ -90,8 +92,7 @@ function runAlgorithm(){
 async function animateAlgorithm(){
   while(animate[animateKey]){
     await wait(700)
-    if (iteratorAlg == null) { iteratorAlg = props.iterator(findNodeByName(nodes, startingNodeName.value), nodes, edges, ref(props.numOfRelaxedEdges)) }
-    console.log("v cykle")
+    if (iteratorAlg == null) { iteratorAlg = props.iterator(findNodeByName(nodes, startingNodeName.value), nodes, edges, ref(props.numOfRelaxedEdges), ref(props.numOfScannedEdges)) }
     if (iteratorAlg.next().done){ animate[animateKey] = false }
   }
 }
@@ -115,19 +116,27 @@ async function animateAlgorithm(){
 
             <label class="label label-colored">in:</label>
             <div class="toggle" :class="{ active: showPertinent.in }" @click="showPertinent.in = !showPertinent.in"> {{ showPertinent.in ? "✔" : "✖" }} </div>
+
+            <div class="M-div">
+              <label class="label label-colored">M:</label>
+              <label class="label label-colored M">{{ (ZwickConstants.M == Infinity ? '∞' : ZwickConstants.M ) }}</label>
+            </div>
           </div>
+          
         </div>
         <div class="relaxed-edges">
           <div>
             <label class="label label-colored"> {{ numOfRelaxedEdges }} </label>
             <label class="label label-colored"> relaxed edges</label>
           </div>
-          
-          <div v-if="label=='Wilson-Zwick'">
-          <label class="label label-colored">M: </label>
-          <label class="label label-colored">{{ (ZwickConstants.M == Infinity ? '∞' : ZwickConstants.M ) }}</label>
+
+          <div>
+            <label class="label label-colored"> {{ numOfScannedEdges }} </label>
+            <label class="label label-colored"> scanned edges</label>
           </div>
+          
         </div>
+        <a :href="helpSite" class="help-icon">?</a>
       </div>
   
       <div class="graph">
@@ -182,7 +191,8 @@ async function animateAlgorithm(){
 
   export default defineComponent({
     name: "GraphAlgorithm",
-  });
+}
+);
 </script>
 
 <style scoped>
@@ -211,5 +221,32 @@ async function animateAlgorithm(){
   display: flex;
   gap: 0px;
   align-items: center; 
+}
+.M-div{
+  margin-left: 10px;
+  margin-right: 5px;
+}
+.M{
+  margin-left: 5px;
+}
+.help-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  border-radius: 50%;
+  background-color: #F2D45C;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: none;
+  font-family: sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: 1px solid #000000;
+}
+.help-icon:hover {
+  background-color: #fff; /* Default Element Plus primary color */
+  border-color: #409EFF;
 }
 </style>

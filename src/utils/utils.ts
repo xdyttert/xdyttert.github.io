@@ -1,6 +1,5 @@
-import { ref, type Ref } from "vue"
-import { type Node, type Edge, type Nodes, type Edges, compareFunc } from "../data/startingGraph";
 import { SortedLinkedList } from "@/data/linkedList";
+import { compareFunc, type Edge, type Edges, type Node, type Nodes } from "../data/startingGraph";
 
 let arbitraryNode: Node = {
     name: "",

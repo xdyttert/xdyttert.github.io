@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, ref, type Ref } from "vue";
-import { Zwick, initialization } from "../algorithms/zwick";
+import { Zwick, initialization } from "../algorithms/wilson-zwick";
 import data from "../data/startingGraph";
 import GraphAlgorithm from "./GraphAlgorithm.vue";
 
@@ -27,6 +27,7 @@ let scannedEdgesZwick = 0
     PKey="isInPZwick"
     cKey="colorZwick"
     prKey="prevZwick"
+    helpSite="../../public/explainWilsonZwick.html"
   />
 </template>
   

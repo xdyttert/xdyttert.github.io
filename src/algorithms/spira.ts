@@ -16,11 +16,12 @@ function forward(vertex: Node){
     }
 }
 
-export function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+export function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>, numOfScannedEdges: Ref<number>){
     P.clear()
     solvedNum = 0
     vertexNum = 0
     numOfRelaxededges.value = 0
+    numOfScannedEdges.value = 0
     for(const key in nodes){
         const vertex = nodes[key]
         vertex.distanceSpira = Infinity
@@ -45,7 +46,7 @@ function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
     v.colorSpira = "red"
 }
 
-export function* Spira(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+export function* Spira(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>, numOfScannedEdges: Ref<number>){
 
     vertexNum = bfs(source, nodes, edges)
     source.distanceSpira = 0
@@ -58,6 +59,7 @@ export function* Spira(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededg
     while (solvedNum != vertexNum && P.length > 0){
         const edge = P.dequeue()
         edge.colorSpira = "orange"
+        numOfScannedEdges.value++
         const u = nodes[edge.source]
         const v = nodes[edge.target]
 

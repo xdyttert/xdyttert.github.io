@@ -1,6 +1,5 @@
 import PriorityQueue from "ts-priority-queue";
-import { ro } from "element-plus/es/locales.mjs";
-import { type Node, type Edge, type Nodes, type Edges } from "../data/startingGraph";
+import { type Edges, type Node, type Nodes } from "../data/startingGraph";
 
 
 const Q: PriorityQueue<Node> = new PriorityQueue({comparator: () => 1})

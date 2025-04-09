@@ -4,9 +4,10 @@ import { type Edge, type Edges, type Node, type Nodes } from "../data/startingGr
 
 const Q = new PriorityQueue({comparator: (node1: Node, node2: Node) => node1.distanceDijkstra - node2.distanceDijkstra})
 
-export function initialization(nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+export function initialization(nodes: Nodes, edges: Edges, numOfRelaxedEdges: Ref<number>, numOfScannedEdges: Ref<number>){
     Q.clear()
-    numOfRelaxededges.value = 0
+    numOfRelaxedEdges.value = 0
+    numOfScannedEdges.value = 0
     for (const key in nodes){
         const u = nodes[key];
         u.distanceDijkstra = Infinity;
@@ -29,7 +30,7 @@ function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
     numOfRelaxededges.value++
 }
 
-export function* Dijkstra(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>){
+export function* Dijkstra(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>, numOfScannedEdges: Ref<number>){
     source.distanceDijkstra = 0;
     Q.queue(source)
     source.isInQDijkstra = true
@@ -43,7 +44,7 @@ export function* Dijkstra(source: Node, nodes: Nodes, edges: Edges, numOfRelaxed
         u.solvedDijkstra = true
 
         for (const edge of u.outDijkstra){
-            console.log(edge)
+            numOfScannedEdges.value++
             const v = nodes[edge.target]
 
             scannedEdges.push(edge)

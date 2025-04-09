@@ -1,7 +1,7 @@
-import { type Layouts, defineConfigs } from "v-network-graph"
-import { inject, reactive } from "vue"
-import { SortedLinkedList } from "./linkedList"
 import { showPertinent } from "@/utils/store"
+import { type Layouts, defineConfigs } from "v-network-graph"
+import { reactive } from "vue"
+import { SortedLinkedList } from "./linkedList"
 
 export const compareFunc = (a: Edge, b: Edge) => a.weight < b.weight
 
