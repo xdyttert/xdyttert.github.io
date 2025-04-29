@@ -2,11 +2,15 @@
 import { type Layouts } from "v-network-graph";
 import { inject, ref, type Ref } from "vue";
 import { SortedLinkedList } from "../data/linkedList";
-import { compareFunc, type Edge, type Edges, type Nodes } from "../data/startingGraph";
+import { compareFunc, makeEdgesLists, type Edge, type Edges, type Nodes } from "../data/startingGraph";
 import { getEdge, updateEdges, updateNodes } from "../utils/utils";
+import { fullGraphNodes, fullGraphEdges, fullGraphLayouts } from "../data/fullGraph8Nodes";
+import { startingGraphNodes, startingGraphEdges, startingGraphLayouts } from "../data/startingGraph";
+import { fullGraph4Nodes, fullGraph4NodesEdges, fullGraph4NodesLayouts } from "../data/fullGraph4Nodes";
+import { binaryTreeNodes, binaryTreeEdges, binaryTreeLayouts } from "../data/treeGraph";
 
-const nodes: Nodes = inject("nodes")!
-const edges: Edges = inject("edges")!
+let nodes: Nodes = inject("nodes")!
+let edges: Edges = inject("edges")!
 
 const nextNodeIndex = ref(Object.keys(nodes).length + 1)
 const nextEdgeIndex = ref(Object.keys(edges).length + 1)
@@ -128,7 +132,7 @@ function updateEdgeWeight(){
     return 
   }
 
-  for(const edgeId of selectedEdges.value){
+  for (const edgeId of selectedEdges.value){
     let source = nodes[edges[edgeId].source]
     let target = nodes[edges[edgeId].target]
     let edge = edges[edgeId]
@@ -147,6 +151,43 @@ function updateEdgeWeight(){
     source.outDijkstra.push(newEdge)
   }
   updateEdges(edges);
+}
+
+function generateRandomGraph(nodes: Nodes, edges: Edges){
+  randomGraph(nodes, edges, layouts)
+  
+  updateNodes(nodes)
+  updateEdges(edges)
+  makeEdgesLists(nodes, edges)
+  console.log(nodes)
+  console.log(edges)
+}
+
+function loadGraph(nodes: Nodes, edges: Edges, layouts: Layouts, newNodes: Nodes, newEdges: Edges, newLayouts: Layouts) {
+  for (const key in nodes){
+    delete nodes[key]
+    delete layouts.nodes[key]
+  }
+
+  console.log(nodes)
+  console.log(layouts)
+  console.log(newLayouts)
+  for (const key in edges){
+    delete edges[key]
+  }
+
+  for (const key in newNodes){
+    nodes[key] = newNodes[key]
+    layouts.nodes[key] = newLayouts.nodes[key]
+  }
+
+  for (const key in newEdges){
+    edges[key] = newEdges[key]
+  }
+
+  makeEdgesLists(nodes, edges)
+  updateNodes(nodes)
+  
 }
 
 </script>
@@ -182,6 +223,15 @@ function updateEdgeWeight(){
           </el-option>
         </el-select>
       </div>
+      <!-- GRAPHS -->
+      <div class="graphs">
+        <el-button @click="generateRandomGraph(nodes, edges)">Random graph</el-button>
+        <el-button @click="loadGraph(nodes, edges, layouts, binaryTreeNodes, binaryTreeEdges, binaryTreeLayouts)">Binary tree</el-button>
+      </div>
+      <div class="graphs">
+        <el-button @click="loadGraph(nodes, edges, layouts, startingGraphNodes, startingGraphEdges, startingGraphLayouts)">Starting graph</el-button>
+        <el-button @click="loadGraph(nodes, edges, layouts, fullGraph4Nodes, fullGraph4NodesEdges, fullGraph4NodesLayouts)">Full graph 4 nodes</el-button>
+      </div>
     </div>
     <!-- SWITCHING OFF COMPONENTS -->
     <div class="toggles">
@@ -199,6 +249,7 @@ function updateEdgeWeight(){
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { randomGraph } from "../data/randomGraph";
 
 export default defineComponent({
     name: "Header",
@@ -209,7 +260,7 @@ export default defineComponent({
 <style scoped>
 .header {
   display: flex;
-  justify-content: space-between; 
+  justify-content: space-between;
   align-items: center; 
   gap: 20px; 
   flex-wrap: wrap; 
@@ -228,8 +279,16 @@ export default defineComponent({
   padding: 3px;
   gap: 3px;
 }
+.graphs {
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  gap: 3px;
+}
 .equal-btn {
-  width: 100 !important;
+  display: flex;
+  justify-content: center;
+  min-width: 200 !important;
   text-align: center;
 }
 .edges {

@@ -9,7 +9,6 @@ import App from './App.vue'
 import { makeEdgesLists } from './data/startingGraph'
 
 const app = createApp(App)
-makeEdgesLists()
 
 app.use(ElementPlus)
 app.use(VNetworkGraph)

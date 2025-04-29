@@ -3,7 +3,7 @@ import { type Layouts, type VNetworkGraphInstance } from "v-network-graph";
 import { defineEmits, defineProps, inject, type Ref, ref } from "vue";
 import { type Edge, type Edges, type Node, type Nodes } from "../data/startingGraph";
 import { animate, type Animate, showPertinent, ZwickConstants } from "../utils/store";
-import { findNodeByName, shortestPathsTree, wait } from "../utils/utils";
+import { findNodeByName, shortestPathsTree, wait, trueInPertinent, trueOutPertinent } from "../utils/utils";
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
 
@@ -65,7 +65,7 @@ const fitGraphToContainer = () => {
 };
 
 let iteratorAlg: Generator<any, void, unknown> | null = null
-props.initialization(nodes, edges, ref(props.numOfRelaxedEdges), ref(props.numOfScannedEdges))
+// props.initialization(nodes, edges, ref(props.numOfRelaxedEdges), ref(props.numOfScannedEdges))
 
 const emit = defineEmits(["update:selectedNodes", "update:selectedEdges"]);
   
@@ -103,9 +103,9 @@ async function animateAlgorithm(){
       <div class="section-header">
         <div>
           <label class="label label-colored"> {{ label }}: </label>
+          <el-button @click="reset">init</el-button>
           <el-button @click="runAlgorithm">></el-button>
           <el-button :class="{ active: animate[animateKey] }" @click="animate[animateKey] = !animate[animateKey]; animateAlgorithm()"> {{ animate[animateKey] ? "||" : ">>" }} </el-button>
-          <el-button @click="reset">reset</el-button>
           <el-button @click="shortestPathsTree(nodes, edges, prevKey, colorKey)">SPT</el-button>
 
           <el-button @click="fitGraphToContainer">fit</el-button>
@@ -117,6 +117,12 @@ async function animateAlgorithm(){
             <label class="label label-colored">in:</label>
             <div class="toggle" :class="{ active: showPertinent.in }" @click="showPertinent.in = !showPertinent.in"> {{ showPertinent.in ? "✔" : "✖" }} </div>
 
+            <el-button @click="trueOutPertinent(nodes, edges, ZwickConstants.M)">true-out</el-button>
+            <el-button @click="trueInPertinent(nodes, edges, ZwickConstants.M)">true-in</el-button>
+
+            <label class="label label-colored">inner:</label>
+            <div class="toggle" :class="{ active: showPertinent.innerCycle }" @click="showPertinent.innerCycle = !showPertinent.innerCycle"> {{ showPertinent.innerCycle ? "✔" : "✖" }} </div>
+
             <div class="M-div">
               <label class="label label-colored">M:</label>
               <label class="label label-colored M">{{ (ZwickConstants.M == Infinity ? '∞' : ZwickConstants.M ) }}</label>
@@ -127,12 +133,12 @@ async function animateAlgorithm(){
         <div class="relaxed-edges">
           <div>
             <label class="label label-colored"> {{ numOfRelaxedEdges }} </label>
-            <label class="label label-colored"> relaxed edges</label>
+            <label class="label label-colored"> relaxed</label>
           </div>
 
           <div>
             <label class="label label-colored"> {{ numOfScannedEdges }} </label>
-            <label class="label label-colored"> scanned edges</label>
+            <label class="label label-colored"> scanned</label>
           </div>
           
         </div>
@@ -205,7 +211,7 @@ async function animateAlgorithm(){
   justify-content: space-between;
   align-items: center;
   flex: 1;
-  height: 70px;
+  height: 100px;
 }
 .relaxed-edges {
   display: flex;  
@@ -218,12 +224,13 @@ async function animateAlgorithm(){
   font-weight: bold;
 }
 .toggles-h {
+  margin-top: 7px;
   display: flex;
-  gap: 0px;
+  gap: 7px;
   align-items: center; 
 }
 .M-div{
-  margin-left: 10px;
+  margin-left: 5px;
   margin-right: 5px;
 }
 .M{

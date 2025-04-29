@@ -5,7 +5,7 @@ import Dijkstra from "./components/Dijkstra.vue";
 import Header from "./components/Header.vue";
 import Spira from "./components/Spira.vue";
 import Zwick from "./components/Zwick.vue";
-import data from "./data/startingGraph";
+import data, { makeEdgesLists } from "./data/startingGraph";
 import { tr } from "element-plus/es/locales.mjs";
 import { type Node, type Edge, type Nodes, type Edges } from "./data/startingGraph";
 
@@ -37,6 +37,8 @@ const show = reactive({
     zwick: true
 })
 provide("show", show)
+
+makeEdgesLists(nodes, edges)
 
 </script>
 
@@ -70,7 +72,7 @@ export default defineComponent({
   width: 100%;
   height: 100%;
 }
-@media (max-width: 1000px) { 
+@media (max-width: 1900px) { 
   .container {
     flex-direction: column;
     overflow-y: auto;
@@ -88,7 +90,6 @@ export default defineComponent({
   gap: 10px;
 }
 .label {
-  min-width: 55px;
   text-align: center;
   color: #000000;
 }
@@ -109,6 +110,7 @@ export default defineComponent({
   font-weight: bold;
   border: 0.5px solid #000000;
   position: relative;
+  margin-left: 1px;
 }
 .el-button:disabled {
   opacity: 1;

@@ -86,9 +86,36 @@ export function shortestPathsTree(nodes: Nodes, edges: Edges, prev: keyof Node, 
     for(const key in nodes){
         let u = nodes[key]
         let treeEdge: Edge = getEdge(getNodeId(u[prev] as Node, nodes), getNodeId(u, nodes), edges)!;
+        if (treeEdge == null) {continue}
         (treeEdge as any)[color] = "brown"
     }
     console.log(edges)
+    updateEdges(edges)
+}
+
+export function trueOutPertinent(nodes: Nodes, edges: Edges, M: number){
+    for (const key in edges){
+        let edge = edges[key]
+        let u = nodes[edge.source]
+        let v = nodes[edge.target]
+
+        if (edge.weight <= 2 * (M - u.distanceZwick)){
+            edge.colorZwick = "cyan"
+        }
+    }
+    updateEdges(edges)
+}
+
+export function trueInPertinent(nodes: Nodes, edges: Edges, M: number){
+    for (const key in edges){
+        let edge = edges[key]
+        let u = nodes[edge.source]
+        let v = nodes[edge.target]
+
+        if (edge.weight < 2 * (v.distanceZwick - M)){
+            edge.colorZwick = "black"
+        }
+    }
     updateEdges(edges)
 }
 

@@ -3,7 +3,7 @@ import { compareFunc } from "@/data/startingGraph"
 import PriorityQueue from "ts-priority-queue"
 import { type Ref } from "vue"
 import { type Edge, type Edges, type Node, type Nodes } from "../data/startingGraph"
-import { ZwickConstants } from "../utils/store"
+import { ZwickConstants, showPertinent } from "../utils/store"
 import { bfs } from "./bfs"
 
 const P = new PriorityQueue({comparator: (edge1: Edge, edge2: Edge) => edge1.PKeyZwick - edge2.PKeyZwick})
@@ -51,7 +51,7 @@ function backward(u: Node){
 
 function request(u: Node, edge: Edge){
     edge.inPertinent = true
-    edge.colorZwick = "yellow"
+    edge.colorZwick = "purple"
     u.req.insertNode(edge)
     if (u.solvedZwick && !u.active){
         forward(u)
@@ -150,7 +150,8 @@ export function* Zwick(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededg
                 backward(v)
                 request(u, edge)
             }
-            yield
+            if (showPertinent.innerCycle) { yield }
+
             if (!(edge.colorZwick == "gray")) { edge.colorZwick = lastColor }
         }   
     }
