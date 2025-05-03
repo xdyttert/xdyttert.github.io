@@ -50,6 +50,12 @@ makeEdgesLists(nodes, edges)
       <Spira class="section" v-if="show.spira"/>
       <Zwick class="section" v-if="show.zwick"/>
     </div>
+    <div class="status-message-container">
+      <div class="status-message">
+        <span class="info-icon">ℹ️</span>
+        <span>When selecting aditional node or edge hold Shift.</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -72,7 +78,7 @@ export default defineComponent({
   width: 100%;
   height: 100%;
 }
-@media (max-width: 1900px) { 
+@media (max-width: 1500px) { 
   .container {
     flex-direction: column;
     overflow-y: auto;
@@ -136,5 +142,28 @@ export default defineComponent({
   color: #000000;
   border-radius: 5px;
   user-select: none;
+}
+.status-message-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 20%;
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+.status-message {
+  padding: 5px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #eee;
+  font-size: 14px;
+  color: #606266;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 -1px 2px rgba(0,0,0,0.1); /* Add subtle shadow to make it stand out */
+}
+
+.info-icon {
+  color: #409EFF;
 }
 </style>

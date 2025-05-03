@@ -167,7 +167,7 @@ const configsZwick = reactive(defineConfigs<Node, Edge>({
     normal: {
       width: 3,
       color: edge => edge.colorZwick,
-      dasharray: edge => (edge.outPertinent && showPertinent.out ? "6" : (edge.inPertinent && showPertinent.in ? "2" : "0"))
+      dasharray: edge => (edge.inPertinent && showPertinent.in ? "2" : (edge.outPertinent && showPertinent.out ? "6" : "0"))
     },
     marker: {
       target: {
