@@ -44,7 +44,7 @@ makeEdgesLists(nodes, edges)
 
 <template> 
   <div id="app">
-    <Header />
+    <Header class="app-header" />
     <div class="container">
       <Dijkstra class="section" v-if="show.dijkstra"/>
       <Spira class="section" v-if="show.spira"/>
@@ -77,6 +77,7 @@ export default defineComponent({
   display: flex;
   width: 100%;
   height: 100%;
+  
 }
 @media (max-width: 1500px) { 
   .container {
@@ -150,7 +151,15 @@ export default defineComponent({
   width: 20%;
   z-index: 1000; /* Ensure it's above other elements */
 }
-
+.app-header {
+  flex: 1;
+  border: 2px solid #000000;
+  border-bottom: 2px solid #000000;
+  min-width: 0;
+  min-height: 50px; /* Add a minimum height */
+  display: block; /* Ensure it's displayed as a block element */
+  width: 100%; /* Make it take full width */
+}
 .status-message {
   padding: 5px;
   background-color: #f9f9f9;

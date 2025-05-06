@@ -1,5 +1,5 @@
 import PriorityQueue from "ts-priority-queue";
-import { Edge, Node, Nodes, Edges } from "../../data/graph";
+import { Edge, Node, Nodes, Edges } from "../data/graph";
 import { relax } from "./dijkstra"
 
 /**
