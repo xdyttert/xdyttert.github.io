@@ -103,6 +103,7 @@ function relax(u: Node, v: Node, edge: Edge, numOfRelaxededges: Ref<number>){
 export function* Zwick(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededges: Ref<number>, numOfScannedEdges: Ref<number>){
     source.distanceZwick = 0
     source.solvedZwick = true
+    solvedNum++
     source.colorZwick = "green"
     vertexNum = bfs(source, nodes, edges)
     forward(source)
