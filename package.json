@@ -7,7 +7,7 @@
     "dev": "vite",
     "serve": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
-    "postbuild-only": "cp dist/index.html dist/404.html",
+    "build-full": "run-p type-check \"build-only {@}\" -- && cp dist/index.html dist/404.html",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force"
