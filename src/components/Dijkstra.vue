@@ -27,7 +27,7 @@ let scannedEdgesDijkstra = 0
     PKey="isInPDijkstra"
     cKey="colorDijkstra"
     prKey="prevDijkstra"
-    helpSite="../public/explainDijkstra.html"
+    helpSite="/public/explainDijkstra.html"
   />
 </template>
   
