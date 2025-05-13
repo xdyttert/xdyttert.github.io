@@ -27,7 +27,7 @@ let scannedEdgesSpira = 0
     PKey="isInPSpira"
     cKey="colorSpira"
     prKey="prevSpira"
-    helpSite="../public/explainSpira.html"
+    helpSite="/explainSpira.html"
   />
 </template>  
 
