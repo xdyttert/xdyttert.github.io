@@ -118,7 +118,6 @@ async function animateAlgorithm(){
             <div class="toggle" :class="{ active: showPertinent.in }" @click="showPertinent.in = !showPertinent.in"> {{ showPertinent.in ? "✔" : "✖" }} </div>
 
             <el-button @click="trueOutPertinent(nodes, edges, ZwickConstants.M)">true-out</el-button>
-            <el-button @click="trueInPertinent(nodes, edges, ZwickConstants.M)">true-in</el-button>
 
             <label class="label label-colored">inner:</label>
             <div class="toggle" :class="{ active: showPertinent.innerCycle }" @click="showPertinent.innerCycle = !showPertinent.innerCycle"> {{ showPertinent.innerCycle ? "✔" : "✖" }} </div>
