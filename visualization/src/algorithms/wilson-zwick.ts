@@ -142,7 +142,7 @@ export function* Zwick(source: Node, nodes: Nodes, edges: Edges, numOfRelaxededg
             let edge = Q.dequeue()
             edge.isInQZwick = false
             let lastColor = edge.colorZwick
-            edge.colorZwick = "magenta"
+            edge.colorZwick = "yellow" // FI yellow color
             
             let u = nodes[edge.source]
             let v = nodes[edge.target]

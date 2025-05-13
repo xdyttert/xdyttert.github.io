@@ -27,7 +27,7 @@ let scannedEdgesZwick = 0
     PKey="isInPZwick"
     cKey="colorZwick"
     prKey="prevZwick"
-    helpSite="../../public/explainWilsonZwick.html"
+    helpSite="../public/explainWilsonZwick.html"
   />
 </template>
   
