@@ -2,7 +2,7 @@
 import { type Layouts, type VNetworkGraphInstance } from "v-network-graph";
 import { defineEmits, defineProps, inject, type Ref, ref } from "vue";
 import { type Edge, type Edges, type Node, type Nodes } from "../data/startingGraph";
-import { animate, type Animate, showPertinent, ZwickConstants } from "../utils/store";
+import { animate, type Animate, showPertinent, ZwickConstants, Visual } from "../utils/store";
 import { findNodeByName, shortestPathsTree, wait, trueInPertinent, trueOutPertinent } from "../utils/utils";
 
 const startingNodeName: Ref<string> = inject("startingNodeName")!
@@ -118,7 +118,7 @@ async function animateAlgorithm(){
             <div class="toggle" :class="{ active: showPertinent.in }" @click="showPertinent.in = !showPertinent.in"> {{ showPertinent.in ? "✔" : "✖" }} </div>
 
             <el-button @click="trueOutPertinent(nodes, edges, ZwickConstants.M)">true-out</el-button>
-
+            
             <label class="label label-colored">inner:</label>
             <div class="toggle" :class="{ active: showPertinent.innerCycle }" @click="showPertinent.innerCycle = !showPertinent.innerCycle"> {{ showPertinent.innerCycle ? "✔" : "✖" }} </div>
 
@@ -159,10 +159,10 @@ async function animateAlgorithm(){
         >
         
           <template #override-node-label="{ nodeId, scale, x, y, config, textAnchor, dominantBaseline }">
-            <text x="0" y="0" :font-size="(config.fontSize - 2) * scale" text-anchor="middle" dominant-baseline="central" fill="#ffffff">
+            <text x="0" y="0" :font-size="(config.fontSize) * scale" text-anchor="middle" dominant-baseline="central" fill="#ffffff">
               {{ nodes[nodeId].name }}
             </text>
-            <text x="0" y="0" :font-size="config.fontSize * scale" :text-anchor="textAnchor"
+            <text x="0" y="0" :font-size="Visual.fontSize" :text-anchor="textAnchor"
               :dominant-baseline="dominantBaseline" :fill="config.color" :transform="`translate(${x} ${y})`">
               {{ ( nodes[nodeId][distanceKeyt] == Infinity ? '∞' : nodes[nodeId][distanceKeyt]) }}
             </text>
@@ -181,9 +181,9 @@ async function animateAlgorithm(){
           </template>
   
           <template #edge-label="{ edge, ...slotProps }">
-            <v-edge-label :text="edge.weight" align="center" vertical-align="above" v-bind="slotProps"/>
-            <v-edge-label :text="'𝒬'" :style="{ fontSize: '10px' }" class="bold-label" text-anchor="start" dx="8" dy="-10" vertical-align="below" v-if="edge[QKeyt]" v-bind="slotProps"/>
-            <v-edge-label :text="'𝑃'" :style="{ fontSize: '10px' }" class="bold-label" text-anchor="end" dx="-8" dy="-10" vertical-align="below" v-if="edge[PKeyt]" v-bind="slotProps"/>
+            <v-edge-label :text="edge.weight" :style="{ fontSize: Visual.fontSize + 'px' }" align="center" vertical-align="above" v-bind="slotProps"/>
+            <v-edge-label :text="'𝒬'" :style="{ fontSize: Visual.fontSize * 0.8 + 'px' }" class="bold-label" text-anchor="start" dx="8" dy="-10" vertical-align="below" v-if="edge[QKeyt]" v-bind="slotProps"/>
+            <v-edge-label :text="'𝑃'" :style="{ fontSize: Visual.fontSize * 0.8 + 'px' }" class="bold-label" text-anchor="end" dx="-8" dy="-10" vertical-align="below" v-if="edge[PKeyt]" v-bind="slotProps"/>
             
           </template>
         </v-network-graph>
@@ -229,7 +229,7 @@ async function animateAlgorithm(){
   align-items: center; 
 }
 .M-div{
-  margin-left: 5px;
+  margin-left: 50px;
   margin-right: 5px;
 }
 .M{

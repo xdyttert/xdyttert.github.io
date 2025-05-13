@@ -8,6 +8,7 @@ import { fullGraphNodes, fullGraphEdges, fullGraphLayouts } from "../data/fullGr
 import { startingGraphNodes, startingGraphEdges, startingGraphLayouts } from "../data/startingGraph";
 import { fullGraph4Nodes, fullGraph4NodesEdges, fullGraph4NodesLayouts } from "../data/fullGraph4Nodes";
 import { binaryTreeNodes, binaryTreeEdges, binaryTreeLayouts } from "../data/treeGraph";
+import { Visual } from "../utils/store";
 
 let nodes: Nodes = inject("nodes")!
 let edges: Edges = inject("edges")!
@@ -233,6 +234,11 @@ function loadGraph(nodes: Nodes, edges: Edges, layouts: Layouts, newNodes: Nodes
         <el-button @click="loadGraph(nodes, edges, layouts, fullGraph4Nodes, fullGraph4NodesEdges, fullGraph4NodesLayouts)">Full graph 4 nodes</el-button>
       </div>
     </div>
+    <div class="fonts">
+      <label class="label">Font size</label>
+      <input type="range" id="fontSize" v-model="Visual.fontSize" min="15" max="30" />
+
+    </div>
     <!-- SWITCHING OFF COMPONENTS -->
     <div class="toggles">
       <label class="label label-colored"> Dijkstra section: </label>
@@ -320,5 +326,9 @@ export default defineComponent({
   border: 0.5px solid #000000;
   border-radius: 5px;
   text-align: center;
+}
+.fonts{
+  display: flex;
+  flex-direction: column;
 }
 </style>
