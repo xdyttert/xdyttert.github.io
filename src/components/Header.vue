@@ -236,7 +236,7 @@ function loadGraph(nodes: Nodes, edges: Edges, layouts: Layouts, newNodes: Nodes
     </div>
     <div class="fonts">
       <label class="label">Font size</label>
-      <input type="range" id="fontSize" v-model="Visual.fontSize" min="15" max="30" />
+      <input type="range" id="fontSize" v-model="Visual.fontSize" min="12" max="27" />
 
     </div>
     <!-- SWITCHING OFF COMPONENTS -->

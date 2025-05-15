@@ -1,7 +1,7 @@
 import { reactive } from "vue";
 
 export const Visual = reactive({
-  fontSize: 10
+  fontSize: 17
 })
 
 export const showPertinent = reactive({

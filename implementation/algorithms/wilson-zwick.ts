@@ -28,7 +28,7 @@ let solvedNum = 0
 
 /**
  * @global
- * @description represents total number of nodes of inputed graph
+ * @description represents total number of nodes in graph
  */
 let vertexNum = 0
 
@@ -119,7 +119,8 @@ function request(u: Node, edge: Edge){
  *  outgoing adjacency list of this node and attribute `.in` which
  *  represent incoming adjacency list of this node
  * @description function wilson_zwick runs algorithm of Wilson and Zwick
- *  on graph represented by `nodes` from starting node `s`
+ *  on graph represented by `nodes` from starting node `s`. For the best possible 
+ *  performance algorithm requires that all nodes are reachable from nodes `s`.
  * @post all nodes have parameters:
  *      - `.d` set to the shortest distance from `s`
  *      - `.prev` set to the previous node in the shortest path
@@ -146,7 +147,6 @@ export function wilson_zwick(s: Node, nodes: Nodes){
     s.d = 0
     solvedNum++
     s.solved = true
-    // vertexNum = bfs(source, nodes, edges) TODO decide if you want to keep this
     forward(s)
 
     while (solvedNum != vertexNum && P.length > 0){

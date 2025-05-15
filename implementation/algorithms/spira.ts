@@ -19,7 +19,7 @@ let solvedNum = 0
 
 /**
  * @global
- * @description represents total number of nodes of inputed graph
+ * @description represents total number of nodes in graph
  */
 let vertexNum = 0
 
@@ -59,9 +59,9 @@ export function spira(s: Node, nodes: Nodes){
         u.d = Infinity
         u.prev = null
         u.out.reset()
+        vertexNum++
     }
 
-    // vertexNum = bfs(source, nodes, edges) TODO decide if you want this
     s.d = 0
     s.solved = true
 

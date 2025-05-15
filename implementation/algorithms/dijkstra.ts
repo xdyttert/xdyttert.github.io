@@ -15,7 +15,7 @@ const Q = new PriorityQueue({comparator:
  * 
  * @param u initial node of the edge
  * @param v terminal node of the edge
- * @param edge edge (u, v)
+ * @param edge edge `(u, v)`
  * @description function relax sets parameters 
  * `u.d` and `u.prev` to correct values when new shortest 
  * path to node `u` from starting node `s` is found
