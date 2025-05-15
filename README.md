@@ -4,20 +4,21 @@ It contains visualization tool for three algorithms. Dijkstra's algorithm, Spira
 
 If you want to run the programm lokally on your PC follow the steps below.
 
+
+
 ## Project Setup
+
+First, install npm - https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+
+then from the folder containing this repo files run: 
 
 ```sh
 npm install
 ```
-
-### Compile and Hot-Reload for Development
+and
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
+tool should be running on addres that is printed in your console.
